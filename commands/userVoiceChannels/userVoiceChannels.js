@@ -1,0 +1,88 @@
+const { SlashCommandBuilder } = require('@discordjs/builders');
+
+var bot;
+var userChannelCategory;
+
+var channels = {};
+
+module.exports = {
+	data: new SlashCommandBuilder()
+		.setName('make-channel')
+		.setDescription('Creates a channel for the user and moves the user to the channel')
+        .addStringOption(option => option.setName('name').setDescription('Name for the channel')),
+	async execute(interaction) {
+		makeChannelByCommand(interaction);
+	},
+};
+
+module.exports.startup = (client) => {
+    bot = client;
+    userChannelCategory = client.channels.cache.find(val => val.name === 'Join to create channel');
+    if (userChannelCategory == null) {
+        var guild = client.guilds.cache.at(0);
+        guild.channels.create('USER CHANNELS', { type: 'GUILD_CATEGORY' }).then(parent => {
+            guild.channels.create('Join to create channel', { type: 'GUILD_VOICE' }).then(chan => {
+                chan.setParent(parent);
+            });
+        });
+        userChannelCategory = client.channels.cache.find(val => val.name === 'Join to create channel');
+    }
+    client.on('voiceStateUpdate', (oldMember, newMember) => {
+        if (newMember.member.voice.channel != null && newMember.member.voice.channel.id == userChannelCategory.id) {
+            makeChannelByJoin(newMember.member);
+        }
+    });
+}
+
+module.exports.getOwnedChannel = (member) => {
+    chans = userChannelCategory.parent.children;
+    var foundChan = null;
+    chans.each(chan => {
+        if (channels[chan.id] != undefined && channels[chan.id].owner == member) {
+            foundChan = chan;
+        }
+    });
+    return foundChan;
+}
+
+function makeChannelByJoin(member) {
+    var name = member.displayName;
+    name += "'s VC";
+    makeChannel(member, name);
+}
+
+function makeChannelByCommand(interaction) {
+    var name = interaction.options.getString('name');
+    if (name == null) {
+        name = interaction.member.displayName;
+        name += "'s VC";
+    }
+    makeChannel(interaction.member, name);
+    interaction.reply({ content: 'Channel created', ephemeral: true });
+}
+
+function makeChannel(member, name) {
+    bot.guilds.cache.at(0).channels.create(name, { type: 'GUILD_VOICE' }).then(chan => { moveUser(member, chan); });
+}
+
+function moveUser(member, chan) {
+    channels[chan.id] = { 'owner': member };
+    chan.setParent(userChannelCategory.parent, {lockPermissions:false});
+    if (member.voice.channel != null) {
+        member.voice.setChannel(chan);
+    }
+    setTimeout(checkIfEmpty(chan), 2500);
+    return;
+}
+
+function checkIfEmpty(chan) {
+    return function () {
+        if (chan.members.size == 0) {
+            delete channels[chan.id];
+            chan.delete();
+            return;
+        }
+        setTimeout(checkIfEmpty(chan), 2500);
+        return;
+    }
+}
