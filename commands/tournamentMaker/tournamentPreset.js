@@ -1,16 +1,18 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const tournament = require('./tournamentMaker.js');
+const tournament = require('./_tournamentMain.js');
 const fs = require('fs');
 const presets = JSON.parse(fs.readFileSync("Resources/ModuleResources/tournyMaker.json")).presets;
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('tournament-preset')
+		.setName('t-preset')
 		.setDescription('Sets the preset for the tournament')
         .addStringOption(option => option.setName('preset')
 			.setDescription('preset')
 			.addChoice('Rocket League 3s', 'Rocket League 3s')
 			.addChoice('Rocket League 2s', 'Rocket League 2s')
+			.addChoice('Overwatch', 'Overwatch')
+			.addChoice('Overwatch 2', 'Overwatch 2')
 			.setRequired(true)),
 	async execute(interaction) {
 		setPreset(interaction);
@@ -25,6 +27,7 @@ function setPreset(interaction) {
 			tournament.setPlayersPerTeam(presets[i].players);
 			tournament.setMinMMR(presets[i].min);
 			tournament.setMaxMMR(presets[i].max);
+			tournament.setMatchmakingType(presets[i].type);
 			if(presets[i].hasOwnProperty("icons")) {
 				tournament.setIcons(JSON.parse(fs.readFileSync(presets[i].icons)).images);
 			}

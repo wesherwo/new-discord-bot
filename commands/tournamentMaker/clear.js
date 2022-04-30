@@ -1,12 +1,12 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const tournament = require('./tournamentMaker.js');
+const tournament = require('./_tournamentMain.js');
 const fs = require('fs');
 
 const defaultChannel = JSON.parse(fs.readFileSync("resources/moduleResources/tournyMaker.json"))["defaultChannel"];
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('tournament-clear')
+		.setName('t-clear')
 		.setDescription('Resets the tournament and removes the created channels'),
 	async execute(interaction) {
 		clear(interaction);
@@ -26,10 +26,10 @@ function clear(interaction) {
 	}
 	for (var i = 0; i < teams.length; i++) {
 		for (var j = 0; j < teams[i].length; j++) {
-			if (teams[i][j][3] != null) {
+			if (teams[i][j].member != null) {
 				for (var k = 0; k < chans.length; k++) {
-					if (chans[k] == teams[i][j][3].voiceChannel) {
-						teams[i][j][3].voice.setChannel(defaultChannelID);
+					if (chans[k] == teams[i][j].member.voiceChannel) {
+						teams[i][j].member.voice.setChannel(defaultChannelID);
 					}
 				}
 			}
@@ -39,4 +39,5 @@ function clear(interaction) {
 	for (var i = 0; i < chans.length; i++) {
 		chans[i].delete();
 	}
+	interaction.reply({ content: 'Tournament reset', ephemeral: true });
 }
