@@ -1,6 +1,3 @@
-config.json
-resources/moduleResources/tournyMaker.json
-
 # Logs
 logs
 *.log
