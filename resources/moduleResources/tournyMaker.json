@@ -1,5 +1,5 @@
 {
-    "defaultChannel": "838821750812573696",
+    "defaultChannel": "XXXXXXXXXXXXXXXX",
     "presets" : [{"name":"Rocket League 3s","players":"3", "min":"0", "max":"2400", "icons":"resources/images/rocketLeagueImages.json", "type":"normal"},
                 {"name":"Rocket League 2s","players":"2", "min":"0", "max":"2400","icons":"resources/images/rocketLeagueImages.json", "type":"normal"},
                 {"name":"Overwatch","players":"6", "min":"0", "max":"5000","icons":"resources/images/overwatchImages.json", "type":"ow"},
