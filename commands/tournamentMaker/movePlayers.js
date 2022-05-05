@@ -5,7 +5,7 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('t-move-players')
 		.setDescription('Moves praticipants to their team channels'),
-	async execute(interaction) {
+	async execute(client, interaction) {
 		movePlayers(interaction);
 	},
 };

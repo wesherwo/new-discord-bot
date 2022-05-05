@@ -9,7 +9,7 @@ module.exports = {
 		.setName('t-kick')
 		.setDescription('Removes a user from the tournament')
         .addUserOption(option => option.setName('target').setDescription('Select a user').setRequired(true)),
-	async execute(interaction) {
+	async execute(client, interaction) {
 		leave(interaction);
 	},
 };

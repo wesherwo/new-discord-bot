@@ -8,7 +8,7 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('t-leave')
 		.setDescription('Removes user from the tournament'),
-	async execute(interaction) {
+	async execute(client, interaction) {
 		leave(interaction);
 	},
 };

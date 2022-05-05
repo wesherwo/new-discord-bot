@@ -18,7 +18,7 @@ module.exports = {
 		.addSubcommand(subcommand =>
 			subcommand.setName('team-stats')
 				.setDescription('Displays team stats')),
-	async execute(interaction) {
+	async execute(client, interaction) {
 		if (interaction.options.getSubcommand() == 'players') {
 			printPlayers(interaction);
 		} else if (interaction.options.getSubcommand() == 'teams') {

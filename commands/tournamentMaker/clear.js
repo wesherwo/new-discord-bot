@@ -8,7 +8,7 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('t-clear')
 		.setDescription('Resets the tournament and removes the created channels'),
-	async execute(interaction) {
+	async execute(client, interaction) {
 		clear(interaction);
 	},
 };

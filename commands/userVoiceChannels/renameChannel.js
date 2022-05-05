@@ -6,7 +6,7 @@ module.exports = {
 		.setName('rename-channel')
 		.setDescription('Renames the users channel')
         .addStringOption(option => option.setName('name').setDescription('Name for the channel').setRequired(true)),
-	async execute(interaction) {
+	async execute(client, interaction) {
 		rename(interaction);
 	},
 };

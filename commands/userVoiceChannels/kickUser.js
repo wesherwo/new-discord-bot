@@ -6,7 +6,7 @@ module.exports = {
 		.setName('kick-user-from-channel')
 		.setDescription('Kicks a user from the owners channel')
         .addUserOption(option => option.setName('target').setDescription('Select a user').setRequired(true)),
-	async execute(interaction) {
+	async execute(client, interaction) {
 		kick(interaction);
 	},
 };

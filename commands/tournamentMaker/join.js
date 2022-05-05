@@ -24,7 +24,7 @@ module.exports = {
 					.addChoice('Support', 'support')
 					.addChoice('Flex', 'flex')
 					.setRequired(true))),
-	async execute(interaction) {
+	async execute(client, interaction) {
 		join(interaction);
 	},
 };

@@ -15,7 +15,7 @@ module.exports = {
 			.addChoice('Overwatch 2', 'Overwatch 2')
 			.setRequired(true))
 		.addIntegerOption(option => option.setName('teams').setDescription('Number of teams for testing').setRequired(true)),
-	async execute(interaction) {
+	async execute(client, interaction) {
 		test(interaction);
 	},
 };

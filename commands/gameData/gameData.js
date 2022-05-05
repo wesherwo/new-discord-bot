@@ -9,7 +9,7 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('server-game-info')
         .setDescription('Displays the server game time played'),
-    async execute(interaction) {
+    async execute(client, interaction) {
         printGameData(interaction);
     },
 };
@@ -79,12 +79,6 @@ function printGameData(interaction) {
             embed.setColor(3447003).setTitle(`page ${page}`);
         }
     }
-}
-
-module.exports.resetData = (interaction) => {
-    var jsonData = JSON.stringify({ 'time': 0, 'gametime': {} });
-    fs.writeFileSync(path, jsonData, function (err) { if (err) { console.log(err); } });
-    interaction.reply({ content: 'Game data reset', ephemeral: true });
 }
 
 function printTime(time) {

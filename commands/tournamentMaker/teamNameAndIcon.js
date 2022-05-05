@@ -13,7 +13,7 @@ module.exports = {
 			subcommand.setName('icon')
 			.setDescription('Link to cion for your team')
 			.addStringOption(option => option.setName('icon').setDescription('Your teams new icon(link to image)').setRequired(true))),
-	async execute(interaction) {
+	async execute(client, interaction) {
 		if(interaction.options.getSubcommand() == 'name') {
 			nameTeam(interaction);
 		} else if(interaction.options.getSubcommand() == 'icon') {

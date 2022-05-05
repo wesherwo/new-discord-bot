@@ -3,22 +3,16 @@ const Discord = require('discord.js');
 const Permissions = Discord.Permissions;
 const userChannels = require('./userVoiceChannels.js');
 
-var bot;
-
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('lock-channel')
 		.setDescription('Locks the users channel'),
-	async execute(interaction) {
-		lock(interaction);
+	async execute(client, interaction) {
+		lock(client, interaction);
 	},
 };
 
-module.exports.startup = (client) => {
-    bot = client;
-}
-
-function lock(interaction) {
+function lock(client, interaction) {
     var chan = userChannels.getOwnedChannel(interaction.member);
     if (chan != null) {
         chan.permissionOverwrites.set([
@@ -27,7 +21,7 @@ function lock(interaction) {
                     allow: [Permissions.FLAGS.CONNECT]
                 },
                 {
-                    id: bot.user.id,
+                    id: client.user.id,
                     allow: [Permissions.FLAGS.CONNECT]
                 },
                 {

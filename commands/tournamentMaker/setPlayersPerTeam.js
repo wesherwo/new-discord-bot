@@ -7,7 +7,7 @@ module.exports = {
 		.setName('t-players-per-team')
 		.setDescription('Sets the number of players per team')
         .addIntegerOption(option => option.setName('players').setDescription('Number of players per team').setRequired(true)),
-	async execute(interaction) {
+	async execute(client, interaction) {
 		if(interaction.options.getInteger('players') < 1) {
 			interaction.reply({ content: 'Must be at least one player per team', ephemeral: true });
 			return;

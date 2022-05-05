@@ -14,7 +14,7 @@ module.exports = {
 			.addChoice('Overwatch', 'Overwatch')
 			.addChoice('Overwatch 2', 'Overwatch 2')
 			.setRequired(true)),
-	async execute(interaction) {
+	async execute(client, interaction) {
 		setPreset(interaction);
 	},
 };

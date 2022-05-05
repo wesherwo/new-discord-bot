@@ -7,7 +7,7 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('unlock-channel')
 		.setDescription('Unlocks the users channel'),
-	async execute(interaction) {
+	async execute(client, interaction) {
 		unlock(interaction);
 	},
 };

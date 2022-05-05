@@ -2,6 +2,7 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const tournament = require('./_tournamentMain.js');
 
 var players = [];
+var tempPlayers = [];
 var teams = [];
 var teamNames = [];
 var teamImg = [];
@@ -16,38 +17,37 @@ module.exports = {
 		.setDescription('Makes Teams/Matches/Channels')
 		.addSubcommand(subcommand =>
 			subcommand.setName('teams')
-			.setDescription('Places the entered players into teams'))
+				.setDescription('Places the entered players into teams'))
 		.addSubcommand(subcommand =>
 			subcommand.setName('matches')
-			.setDescription('Creates creates matches for the tournament')
-			.addStringOption(option => option.setName('tournament-type')
-				.setDescription('single/double/round-robin')
-				.addChoice('single-elimination', 'single')
-				.addChoice('double-elimination', 'double')
-				.addChoice('round-robin', 'round')
-				.setRequired(true)))
+				.setDescription('Creates creates matches for the tournament')
+				.addStringOption(option => option.setName('tournament-type')
+					.setDescription('single/double/round-robin')
+					.addChoice('single-elimination', 'single')
+					.addChoice('double-elimination', 'double')
+					.addChoice('round-robin', 'round')
+					.setRequired(true)))
 		.addSubcommand(subcommand =>
 			subcommand.setName('channels')
-			.setDescription('Creates voice channels for each team')),
-	async execute(interaction) {
-		if(interaction.options.getSubcommand() == 'teams') {
-			interaction.reply({ content: 'Teams being created', ephemeral: true });
+				.setDescription('Creates voice channels for each team')),
+	async execute(client, interaction) {
+		if (interaction.options.getSubcommand() == 'teams') {
+			await interaction.deferReply();
 			makeTeams(interaction);
-		} else if(interaction.options.getSubcommand() == 'matches') {
+		} else if (interaction.options.getSubcommand() == 'matches') {
 			makeMatches(interaction);
-		} else if(interaction.options.getSubcommand() == 'channels') {
+		} else if (interaction.options.getSubcommand() == 'channels') {
 			makeChannels(interaction);
 		}
 	},
 };
 
-function makeTeams(interaction) {
-    let icons = tournament.getIcons();
+async function makeTeams(interaction) {
+	let icons = tournament.getIcons();
 	randomShuffle(icons);
-	let respondChannel = interaction.channel;
-    players = tournament.getPlayers();
+	players = tournament.getPlayers();
 	playersPerTeam = tournament.getPlayersPerTeam();
-	if(!(players.length >= playersPerTeam * 2)){
+	if (!(players.length >= playersPerTeam * 2)) {
 		interaction.reply({ content: 'Not enough players signed up', ephemeral: true });
 		return;
 	}
@@ -58,32 +58,43 @@ function makeTeams(interaction) {
 	subsNum = players.length - (teamNum * playersPerTeam);
 	teamsScore = -1;
 	//console.log(totalCombos(playersPerTeam, teamNum));
-	if(tournament.getMatchmakingType() == 'ow') {
-		let dps = players.filter(player => player.role === 'dps');
-		let tank = players.filter(player => player.role === 'tank');
-		let support = players.filter(player => player.role === 'support');
-		let flex = players.filter(player => player.role === 'flex');
-		for (let i = 0; i < 500000; i++) {
+	let shuffles = 500000 * Math.log2(teamNum);
+	//console.log(shuffles);
+	if (tournament.getMatchmakingType() == 'ow') {
+		let dps = [];
+		let tank = [];
+		let support = [];
+		let flex = [];
+		for (let i = 0; i < players.length; i++) {
+			if (players[i].role === 'dps') { dps.push(i); }
+			else if (players[i].role === 'tank') { tank.push(i); }
+			else if (players[i].role === 'support') { support.push(i); }
+			else if (players[i].role === 'flex') { flex.push(i); }
+		}
+		for (let i = 0; i < shuffles; i++) {
 			randomShuffle(dps);
 			randomShuffle(tank);
 			randomShuffle(support);
 			randomShuffle(flex);
-			players = dps.concat(tank).concat(support).concat(flex);
-        	scoreTeams(i);
+			tempPlayers = dps.concat(tank).concat(support).concat(flex);
+			scoreTeams(i);
 		}
 	} else {
-		for (let i = 0; i < 500000; i++) {
-			randomShuffle(players);
-        	scoreTeams(i);
+		for (let i = 0; i < players.length; i++) {
+			tempPlayers.push(i);
+		}
+		for (let i = 0; i < shuffles; i++) {
+			randomShuffle(tempPlayers);
+			scoreTeams(i);
 		}
 	}
 	for (let i = 0; i < teamNum; i++) {
 		teamNames.push('Team' + (i + 1));
 		teamImg.push(icons[i % icons.length]);
 	}
-	respondChannel.send(teamNum + ' Teams have been created');
+	await interaction.editReply((teamNum + ' Teams have been created'));
 	tournament.setTeamNum(teamNum);
-    tournament.setTeams(teams);
+	tournament.setTeams(teams);
 	tournament.setTeamNames(teamNames);
 	tournament.setTeamIcons(teamImg);
 }
@@ -94,32 +105,30 @@ function scoreTeams(shuff) {
 	for (let i = 0; i < teamNum; i++) {
 		let avgMMR = 0;
 		for (let j = 0; j < playersPerTeam; j++) {
-			avgMMR += players[i + (j * teamNum)].rank;
+			avgMMR += players[tempPlayers[i + (j * teamNum)]].rank;
 		}
 		teamMMR.push(avgMMR / playersPerTeam);
 	}
 	//score the current teams based on MMR
 	let MMRScore = 0;
 	for (let i = 0; i < teamNum; i++) {
-		for (let j = i; j < teamNum; j++) {
-			if (i != j) {
-				MMRScore += Math.abs(teamMMR[i] - teamMMR[j]);
-			}
+		for (let j = i + 1; j < teamNum; j++) {
+			MMRScore += Math.abs(teamMMR[i] - teamMMR[j]) / teamNum;
 		}
 	}
 	//given a better score sets new lineup
 	if (teamsScore > MMRScore || teamsScore < 0) {
-		//console.log((MMRScore/((teamNum*teamNum)-teamNum)) + ' - ' + shuff);
+		//console.log(MMRScore + ' - ' + shuff);
 		teams = [];
 		for (let i = 0; i < teamNum; i++) {
 			teams[i] = [];
 			for (let j = 0; j < playersPerTeam; j++) {
-				teams[i].push(players[i + (j * teamNum)]);
+				teams[i].push(players[tempPlayers[i + (j * teamNum)]]);
 			}
 		}
 		//subs
 		for (let i = 1; i <= subsNum; i++) {
-			teams[i % teamNum].push(players[players.length - i]);
+			teams[i % teamNum].push(players[tempPlayers.length - i]);
 		}
 		teamsScore = MMRScore;
 	}
@@ -137,7 +146,7 @@ function randomShuffle(array) {
 
 
 function makeMatches(interaction) {
-	if(!tournament.teamsCreated()){
+	if (!tournament.teamsCreated()) {
 		interaction.reply({ content: 'Teams not created', ephemeral: true });
 		return;
 	}
@@ -223,15 +232,15 @@ function roundRobin(teams, rounds) {
 }
 
 function makeChannels(interaction) {
-	if(!tournament.teamsCreated()){
+	if (!tournament.teamsCreated()) {
 		interaction.reply({ content: 'Teams not created', ephemeral: true });
 		return;
 	}
-    let teams = tournament.getTeams();
-    let teamNames = tournament.getTeamNames();
+	let teams = tournament.getTeams();
+	let teamNames = tournament.getTeamNames();
 	for (let i = 0; i < teams.length; i++) {
 		if (interaction.guild.channels.cache.find(val => val.name === teamNames[i]) === undefined) {
-			interaction.guild.channels.create(teamNames[i], {type:"GUILD_VOICE"});
+			interaction.guild.channels.create(teamNames[i], { type: "GUILD_VOICE" });
 		}
 	}
 	interaction.reply({ content: 'Channels created', ephemeral: true });

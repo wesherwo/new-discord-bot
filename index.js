@@ -1,5 +1,6 @@
 const fs = require('node:fs');
 const { Client, Collection, Intents } = require('discord.js');
+const { Player } = require("discord-player");
 const { token } = require('./config.json');
 
 const client = new Client({
@@ -27,5 +28,14 @@ for (const file of eventFiles) {
 		client.on(event.name, (...args) => event.execute(client, ...args));
 	}
 }
+
+client.player = new Player(client, {
+	leaveOnEnd: true,
+	leaveOnStop: true,
+	leaveOnEmpty: true,
+	leaveOnEmptyCooldown: 60000,
+	autoSelfDeaf: true,
+	initialVolume: 100
+});
 
 client.login(token);

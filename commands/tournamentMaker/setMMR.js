@@ -14,7 +14,7 @@ module.exports = {
 				subcommand.setName('max')
 				.setDescription('Sets the maximun MMR')
 				.addIntegerOption(option => option.setName('max').setDescription('Maximum MMR').setRequired(true))),
-	async execute(interaction) {
+	async execute(client, interaction) {
 		if(interaction.options.getSubcommand() == 'min') {
 			if(tournament.getMaxMMR() <= interaction.options.getInteger('min')){
 				interaction.reply({ content: 'Minimum must be less than maximum', ephemeral: true });

@@ -6,7 +6,7 @@ module.exports = {
 		.setName('allow-user-in-channel')
 		.setDescription('Allows a user to join the owners channel')
         .addUserOption(option => option.setName('target').setDescription('Select a user').setRequired(true)),
-	async execute(interaction) {
+	async execute(client, interaction) {
 		allow(interaction);
 	},
 };

@@ -4,8 +4,8 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('roll')
 		.setDescription('Rolls some dice')
-        .addStringOption(option => option.setName('dice').setDescription('Format is xDy+z.').setRequired(true)),
-	async execute(interaction) {
+        .addStringOption(option => option.setName('dice').setDescription('Format is xDy+z').setRequired(true)),
+	async execute(client, interaction) {
 		var roll = 0;
         var arr = interaction.options.getString('dice').split('+');
         var rolls = '';

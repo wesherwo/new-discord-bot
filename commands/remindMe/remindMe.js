@@ -16,7 +16,7 @@ module.exports = {
         .addIntegerOption(option => option.setName('minute').setDescription('Time for the reminder').setRequired(true))
         .addStringOption(option =>option.setName('am-pm').setDescription('AM/PM').addChoice('AM', 'am').addChoice('PM', 'pm').setRequired(true))
         .addStringOption(option => option.setName('message').setDescription('Message to remind user').setRequired(true)),
-	async execute(interaction) {
+	async execute(client, interaction) {
 		ping(interaction, true);
 	},
 };

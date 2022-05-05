@@ -21,7 +21,7 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('t-help')
 		.setDescription('Shows commands for tournaments and how to use them to run a tournament'),
-	async execute(interaction) {
+	async execute(client, interaction) {
 		let embed = new MessageEmbed();
     	embed.setColor(3447003).setTitle('List of commands').addFields(
 			[{name:'t-clear',value:'Resets the tournament and removes the created channels'},
@@ -35,10 +35,9 @@ module.exports = {
 			{name:'t-preset',value:'Sets the preset for the tournament'},
 			{name:'t-print',value:'Displays players/teams/matches/team stats for the tournament'},
 			{name:'t-set-mmr',value:'Sets the minimum/maximum mmr for the tournament'},
-			{name:'t-team',value:'Change your teams name or icon'}]);
-		interaction.channel.send({embeds: [embed]});
-
-		interaction.channel.send('Basic usage:\n1. t-preset\n2. t-join\n3. t-make teams after all players are entered\n4. t-make matches\n5. t-print teams\n6. t-print matches');
+			{name:'t-team',value:'Change your teams name or icon'},
+			{name:'Basic usage',value:'1. t-preset\n2. t-join\n3. t-make teams after all players are entered\n4. t-make matches\n5. t-print teams\n6. t-print matches'}]);
+			interaction.reply({ ephemeral: true, embeds: [embed] });
 	},
 };
 

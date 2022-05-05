@@ -3,7 +3,7 @@ const { MessageEmbed } = require('discord.js');
 module.exports = {
 	name: 'messageUpdate',
 	async execute(client, oldMessage, newMessage) {
-		if (oldMessage.member == null || oldMessage.author == client.user) {
+		if (oldMessage.member == null || oldMessage.author.id == client.user.id) {
             return;
         }
         let embed = new MessageEmbed();

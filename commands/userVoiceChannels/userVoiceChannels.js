@@ -1,8 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 
-var bot;
 var userChannelCategory;
-
 var channels = {};
 
 module.exports = {
@@ -10,13 +8,12 @@ module.exports = {
 		.setName('make-channel')
 		.setDescription('Creates a channel for the user and moves the user to the channel')
         .addStringOption(option => option.setName('name').setDescription('Name for the channel')),
-	async execute(interaction) {
-		makeChannelByCommand(interaction);
+	async execute(client, interaction) {
+		makeChannelByCommand(client, interaction);
 	},
 };
 
 module.exports.startup = (client) => {
-    bot = client;
     userChannelCategory = client.channels.cache.find(val => val.name === 'Join to create channel');
     if (userChannelCategory == null) {
         var guild = client.guilds.cache.at(0);
@@ -29,7 +26,7 @@ module.exports.startup = (client) => {
     }
     client.on('voiceStateUpdate', (oldMember, newMember) => {
         if (newMember.member.voice.channel != null && newMember.member.voice.channel.id == userChannelCategory.id) {
-            makeChannelByJoin(newMember.member);
+            makeChannelByJoin(client, newMember.member);
         }
     });
 }
@@ -45,24 +42,24 @@ module.exports.getOwnedChannel = (member) => {
     return foundChan;
 }
 
-function makeChannelByJoin(member) {
+function makeChannelByJoin(client, member) {
     var name = member.displayName;
     name += "'s VC";
-    makeChannel(member, name);
+    makeChannel(client, member, name);
 }
 
-function makeChannelByCommand(interaction) {
+function makeChannelByCommand(client, interaction) {
     var name = interaction.options.getString('name');
     if (name == null) {
         name = interaction.member.displayName;
         name += "'s VC";
     }
-    makeChannel(interaction.member, name);
+    makeChannel(client, interaction.member, name);
     interaction.reply({ content: 'Channel created', ephemeral: true });
 }
 
-function makeChannel(member, name) {
-    bot.guilds.cache.at(0).channels.create(name, { type: 'GUILD_VOICE' }).then(chan => { moveUser(member, chan); });
+function makeChannel(client, member, name) {
+    client.guilds.cache.at(0).channels.create(name, { type: 'GUILD_VOICE' }).then(chan => { moveUser(member, chan); });
 }
 
 function moveUser(member, chan) {

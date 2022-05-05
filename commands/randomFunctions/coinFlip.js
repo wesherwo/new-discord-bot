@@ -4,7 +4,7 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('coin-flip')
 		.setDescription('Flips a Coin'),
-	async execute(interaction) {
+	async execute(client, interaction) {
 		if(Math.random() > 0.5){
             interaction.reply('Heads!');
             return;
