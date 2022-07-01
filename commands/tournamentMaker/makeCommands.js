@@ -23,9 +23,9 @@ module.exports = {
 				.setDescription('Creates creates matches for the tournament')
 				.addStringOption(option => option.setName('tournament-type')
 					.setDescription('single/double/round-robin')
-					.addChoice('single-elimination', 'single')
-					.addChoice('double-elimination', 'double')
-					.addChoice('round-robin', 'round')
+					.addChoices({name: 'single-elimination', value: 'single'},
+								{name: 'double-elimination', value: 'double'},
+								{name: 'round-robin', value: 'round'})
 					.setRequired(true)))
 		.addSubcommand(subcommand =>
 			subcommand.setName('channels')

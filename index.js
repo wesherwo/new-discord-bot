@@ -9,6 +9,14 @@ const client = new Client({
 });
 
 client.commands = new Collection();
+client.player = new Player(client, {
+	leaveOnEnd: true,
+	leaveOnStop: true,
+	leaveOnEmpty: true,
+	leaveOnEmptyCooldown: 60000,
+	autoSelfDeaf: true,
+	initialVolume: 100
+});
 
 fs.readdirSync('./commands').forEach(dirs => {
 	const commandFiles = fs.readdirSync(`./commands/${dirs}`).filter(file => file.endsWith('.js'));
@@ -28,14 +36,5 @@ for (const file of eventFiles) {
 		client.on(event.name, (...args) => event.execute(client, ...args));
 	}
 }
-
-client.player = new Player(client, {
-	leaveOnEnd: true,
-	leaveOnStop: true,
-	leaveOnEmpty: true,
-	leaveOnEmptyCooldown: 60000,
-	autoSelfDeaf: true,
-	initialVolume: 100
-});
 
 client.login(token);

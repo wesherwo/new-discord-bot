@@ -9,10 +9,10 @@ module.exports = {
 		.setDescription('Helps test the tournament')
         .addStringOption(option => option.setName('preset')
 			.setDescription('preset')
-			.addChoice('Rocket League 3s', 'Rocket League 3s')
-			.addChoice('Rocket League 2s', 'Rocket League 2s')
-			.addChoice('Overwatch', 'Overwatch')
-			.addChoice('Overwatch 2', 'Overwatch 2')
+			.addChoices({name: 'Rocket League 3s', value: 'Rocket League 3s'},
+						{name: 'Rocket League 2s', value: 'Rocket League 2s'},
+						{name: 'Overwatch', value: 'Overwatch'},
+						{name:'Overwatch 2', value: 'Overwatch 2'})
 			.setRequired(true))
 		.addIntegerOption(option => option.setName('teams').setDescription('Number of teams for testing').setRequired(true)),
 	async execute(client, interaction) {

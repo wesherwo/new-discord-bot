@@ -19,10 +19,10 @@ module.exports = {
 			.addStringOption(option =>
 				option.setName('role')
 					.setDescription('Your role')
-					.addChoice('DPS', 'dps')
-					.addChoice('Tank', 'tank')
-					.addChoice('Support', 'support')
-					.addChoice('Flex', 'flex')
+					.addChoices({name: 'DPS', value: 'dps'},
+								{name: 'Tank', value: 'tank'},
+								{name: 'Support', value: 'support'},
+								{name: 'Flex', value: 'flex'})
 					.setRequired(true))),
 	async execute(client, interaction) {
 		join(interaction);

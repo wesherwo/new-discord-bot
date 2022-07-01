@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageActionRow, MessageButton } = require("discord.js");
+const { MessageActionRow, MessageButton, MessageEmbed } = require("discord.js");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -31,12 +31,12 @@ module.exports = {
     }
 
     const invite = await channel.createInvite({
-      targetApplication: "755600276941176913",
+      targetApplication: "880218394199220334",
       targetType: 2
     });
 
-    const embed = client.say.rootEmbed(interaction)
-      .setTitle(`Successfully setup **YouTube Watch Together** activity to **${channel.name}** channel.`);
+    let embed = new MessageEmbed();
+    embed.setTitle(`Successfully setup **YouTube Watch Together** activity to **${channel.name}** channel.`);
 
     const btnRow = new MessageActionRow().addComponents([
       new MessageButton()

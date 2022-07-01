@@ -9,7 +9,6 @@ module.exports = {
         let embed = new MessageEmbed();
         embed.setColor(3447003).setTitle('List of commands').addFields(
             [{ name: 'clear', value: 'Clears the current queue' },
-            { name: 'filter', value: 'Filters commands' },
             { name: 'jump', value: 'Jump to a specific track in the queue' },
             { name: 'loop', value: 'Change the loop mode (autoplay|track|queue|off)' },
             { name: 'lyrics', value: 'Get lyrics for a song' },
