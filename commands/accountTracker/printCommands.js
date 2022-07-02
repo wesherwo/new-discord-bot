@@ -57,7 +57,7 @@ function printList(interaction) {
         }
         var toSend = [];
         toSend.push('```xl');
-        lists[list].accounts.forEach(account => toSend.push(accounts[lists[list].game] + ' - ' + accounts[Lists[list].game][account]));
+        lists[list].accounts.forEach(account => toSend.push(accounts[lists[list].game] + ' - ' + accounts[lists[list].game][account]));
         toSend.push('```');
 	    interaction.reply(toSend.join('\n'));
     } else {

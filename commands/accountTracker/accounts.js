@@ -5,7 +5,7 @@ const accountsPath = 'saveData/accounts.json';
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName('at')
+    .setName('at-accounts')
     .setDescription('Add/Detete an account form list')
     .addSubcommand(subcommand =>
       subcommand.setName('new')
