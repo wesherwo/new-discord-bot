@@ -1,11 +1,9 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const fs = require('fs');
-const listPath = 'saveData/accountLists.json';
-const accountsPath = 'saveData/accounts.json';
+const accTrack = require('./_accountTracker.js');
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName('at-accounts')
+    .setName('at-account')
     .setDescription('Add/Detete an account form list')
     .addSubcommand(subcommand =>
       subcommand.setName('new')
@@ -23,7 +21,7 @@ module.exports = {
 		    .addStringOption(option => option.setName('list').setDescription('Name of the list to add the account to').setRequired(true))
         .addStringOption(option => option.setName('account').setDescription('Account to add to the list').setRequired(true)))
 	  .addSubcommand(subcommand =>
-		  subcommand.setName('remove')
+		  subcommand.setName('delete')
 		    .setDescription('removes an account from a list')
 		    .addStringOption(option => option.setName('list').setDescription('Name of the list to add the account to').setRequired(true))
         .addStringOption(option => option.setName('account').setDescription('Account to add to the list').setRequired(true)))
@@ -42,7 +40,7 @@ module.exports = {
       addNewAccount(interaction);
     } else if(interaction.options.getSubcommand() == 'add') {
       addAccountToList(interaction);
-    } else if(interaction.options.getSubcommand() == 'remove') {
+    } else if(interaction.options.getSubcommand() == 'delete') {
       removeAccountFromList(interaction);
     } else if(interaction.options.getSubcommand() == 'update') {
       updateAccountRank(interaction);
@@ -51,27 +49,27 @@ module.exports = {
 }
 
 function addNewAccount(interaction) {
-  var accounts = JSON.parse(fs.readFileSync(accountsPath));
+  var accounts= accTrack.getAccounts();
   var game = interaction.options.getString('game');
   var account = interaction.options.getString('account');
-  if(!accounts[game].hasOwnProperty(account)) {
+  if(!accTrack.accountExists(account, game)) {
     accounts[game][account] = interaction.options.getString('rank')
   } else {
     interaction.reply({ content: 'Account already exists.', ephemeral: true });
     return;
   }
-  var jsonData = JSON.stringify(accounts);
-  fs.writeFileSync(accountsPath, jsonData, function (err) { if (err) { console.log(err); } });
+  accTrack.setAccounts(accounts);
   interaction.reply({ content: 'Account added.', ephemeral: true });
 }
 
 function addAccountToList(interaction) {
-  var lists = JSON.parse(fs.readFileSync(listPath));
-  var accounts = JSON.parse(fs.readFileSync(accountsPath));
-  if(lists.hasOwnProperty(interaction.options.getString('list'))) {
-    var account = accounts[lists[interaction.options.getString('list')].game][interaction.options.getString('account')]
+  var lists = accTrack.getLists();
+  var accounts = accTrack.getAccounts();
+  var list = accTrack.getListName(interaction.options.getString('list'));
+  var account = accTrack.getAccountName(interaction.options.getString('account'), lists[list].game);
+  if(accTrack.listExists(list)) {
     if(account) {
-      lists[interaction.options.getString('list')].accounts.push(interaction.options.getString('account'));
+      lists[list].accounts.push(account);
     } else {
       interaction.reply({ content: 'Account does not exist.', ephemeral: true });
       return;
@@ -80,16 +78,15 @@ function addAccountToList(interaction) {
     interaction.reply({ content: 'List does not exist.', ephemeral: true });
     return;
   }
-  var jsonData = JSON.stringify(lists);
-  fs.writeFileSync(listPath, jsonData, function (err) { if (err) { console.log(err); } });
+  accTrack.setLists(lists);
   interaction.reply({ content: 'Account added to list.', ephemeral: true });
 }
 
 function removeAccountFromList(interaction) {
-  var lists = JSON.parse(fs.readFileSync(listPath));
-  var list = interaction.options.getString('list');
-  var account = interaction.options.getString('account');
-  if(lists.hasOwnProperty(list)) {
+  var lists = accTrack.getLists();
+  var list = accTrack.getListName(interaction.options.getString('list'));
+  var account = accTrack.getAccountName(interaction.options.getString('account'), game);
+  if(accTrack.listExists(list)) {
     var index = lists[list].accounts.indexOf(account);
     if(index >= 0) {
       lists[list].accounts.splice(index, 1);
@@ -101,22 +98,20 @@ function removeAccountFromList(interaction) {
     interaction.reply({ content: 'List does not exist.', ephemeral: true });
     return;
   }
-  var jsonData = JSON.stringify(lists);
-  fs.writeFileSync(listPath, jsonData, function (err) { if (err) { console.log(err); } });
+  accTrack.setLists(lists);
   interaction.reply({ content: 'Account removed from list.', ephemeral: true });
 }
 
 function updateAccountRank(interaction) {
-  var accounts = JSON.parse(fs.readFileSync(accountsPath));
+  var accounts = accTrack.getAccounts();
   var game = interaction.options.getString('game');
-  var account = interaction.options.getString('account');
-  if(accounts[game].hasOwnProperty(account)) {
-    accounts[game][account] = interaction.options.getString('rank')
+  var account = accTrack.getAccountName(interaction.options.getString('account'), game);
+  if(accTrack.accountExists(account, game)) {
+    accounts[game][account] = interaction.options.getString('rank');
   } else {
     interaction.reply({ content: 'Account does not exist.', ephemeral: true });
     return;
   }
-  var jsonData = JSON.stringify(accounts);
-  fs.writeFileSync(accountsPath, jsonData, function (err) { if (err) { console.log(err); } });
+  accTrack.setAccounts(accounts);
   interaction.reply({ content: 'Account rank updated.', ephemeral: true });
 }

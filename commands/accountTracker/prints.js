@@ -1,7 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const fs = require('fs');
-const listPath = 'saveData/accountLists.json';
-const accountsPath = 'saveData/accounts.json';
+const accTrack = require('./_accountTracker.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -11,7 +9,7 @@ module.exports = {
 			subcommand.setName('lists')
 				.setDescription('Displays lists'))
 		.addSubcommand(subcommand =>
-			subcommand.setName('list')
+			subcommand.setName('display')
 				.setDescription('Displays accounts in a list')
                 .addStringOption(option => option.setName('name').setDescription('Name of the list to delete').setRequired(true)))
 		.addSubcommand(subcommand =>
@@ -25,7 +23,7 @@ module.exports = {
 	async execute(client, interaction) {
 		if (interaction.options.getSubcommand() == 'lists') {
 			printLists(interaction);
-		} else if (interaction.options.getSubcommand() == 'list') {
+		} else if (interaction.options.getSubcommand() == 'display') {
 			printList(interaction);
 		} else if (interaction.options.getSubcommand() == 'accounts') {
 			printAccounts(interaction);
@@ -34,30 +32,30 @@ module.exports = {
 };
 
 function printLists(interaction) {
-    var lists = JSON.parse(fs.readFileSync(listPath));
+    var lists = accTrack.getLists();
     if(Object.keys(lists).length == 0) {
         interaction.reply({ content: 'No list yet.', ephemeral: true });
         return;
     }
     var toSend = [];
     toSend.push('```xl');
-    Object.keys(JSON.parse(fs.readFileSync(listPath))).forEach(list => toSend.push(list + ' - ' + lists[list].game))
+    Object.keys(lists).forEach(list => toSend.push(list + ' - ' + lists[list].game))
 	toSend.push('```');
 	interaction.reply(toSend.join('\n'));
 }
 
 function printList(interaction) {
-    var lists = JSON.parse(fs.readFileSync(listPath));
-    var accounts = JSON.parse(fs.readFileSync(accountsPath));
-    var list = interaction.options.getString('name');
-    if (lists.hasOwnProperty(list)) {
+    var lists = accTrack.getLists();
+    var accounts = accTrack.getAccounts();
+    var list = accTrack.getListName(interaction.options.getString('name'));
+    if (accTrack.listExists(list)) {
         if(lists[list].accounts.length == 0) {
             interaction.reply({ content: 'No accounts in this list yet.', ephemeral: true });
             return;
         }
         var toSend = [];
         toSend.push('```xl');
-        lists[list].accounts.forEach(account => toSend.push(accounts[lists[list].game] + ' - ' + accounts[lists[list].game][account]));
+        lists[list].accounts.forEach(account => toSend.push(account + ' - ' + accounts[lists[list].game][account]));
         toSend.push('```');
 	    interaction.reply(toSend.join('\n'));
     } else {
@@ -67,7 +65,7 @@ function printList(interaction) {
 }
 
 function printAccounts(interaction) {
-    var accounts = JSON.parse(fs.readFileSync(accountsPath));
+    var accounts = accTrack.getAccounts();
     var game = interaction.options.getString('game');
     if(Object.keys(accounts[game]).length == 0) {
         interaction.reply({ content: 'No accounts for that game yet.', ephemeral: true });
@@ -75,7 +73,7 @@ function printAccounts(interaction) {
     }
     var toSend = [];
     toSend.push('```xl');
-    Object.keys(JSON.parse(fs.readFileSync(accountsPath))[game]).forEach(account => toSend.push(account + ' - ' + accounts[game][account]))
+    Object.keys(accounts[game]).forEach(account => toSend.push(account + ' - ' + accounts[game][account]))
 	toSend.push('```');
 	interaction.reply(toSend.join('\n'));
 }
