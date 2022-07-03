@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
+const { MessageEmbed } = require('discord.js');
 const fs = require('node:fs');
-const accounts = require('./accounts');
 const listPath = 'saveData/accountLists.json';
 const accountsPath = 'saveData/accounts.json';
 
@@ -20,7 +20,8 @@ module.exports = {
             { name: 'at-list rename', value: 'Get lyrics for a song' },
             { name: 'at-print accounts', value: 'Displays all accounts for a game' },
             { name: 'at-print display', value: 'Displays accounts for a list' },
-            { name: 'at-print lists', value: 'Displays lists' }]);
+            { name: 'at-print lists', value: 'Displays lists' },
+            {name:'Basic usage',value:'1. at-list create\n2. at-account new\n3. at-account add\n4. at-print display'}]);
         interaction.reply({ ephemeral: true, embeds: [embed] });
 	},
 };
