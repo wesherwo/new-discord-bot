@@ -39,7 +39,7 @@ function printLists(interaction) {
     }
     var toSend = [];
     toSend.push('```xl');
-    Object.keys(lists).forEach(list => toSend.push(list + ' - ' + lists[list].game))
+    Object.keys(lists).sort().forEach(list => toSend.push(list + ' - ' + lists[list].game))
 	toSend.push('```');
 	interaction.reply(toSend.join('\n'));
 }
@@ -55,7 +55,7 @@ function printList(interaction) {
         }
         var toSend = [];
         toSend.push('```xl');
-        lists[list].accounts.forEach(account => toSend.push(account + ' - ' + accounts[lists[list].game][account]));
+        lists[list].accounts.sort().forEach(account => toSend.push(account + ' - ' + accounts[lists[list].game][account]));
         toSend.push('```');
 	    interaction.reply(toSend.join('\n'));
     } else {
@@ -73,7 +73,7 @@ function printAccounts(interaction) {
     }
     var toSend = [];
     toSend.push('```xl');
-    Object.keys(accounts[game]).forEach(account => toSend.push(account + ' - ' + accounts[game][account]))
+    Object.keys(accounts[game]).sort().forEach(account => toSend.push(account + ' - ' + accounts[game][account]))
 	toSend.push('```');
 	interaction.reply(toSend.join('\n'));
 }

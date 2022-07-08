@@ -16,10 +16,10 @@ module.exports = {
                       .setRequired(true))
         .addStringOption(option => option.setName('rank').setDescription('Rank of the account').setRequired(true)))
     .addSubcommand(subcommand =>
-		  subcommand.setName('add')
+		  subcommand.setName('add-to-list')
 		    .setDescription('add an account to a list')
 		    .addStringOption(option => option.setName('list').setDescription('Name of the list to add the account to').setRequired(true))
-        .addStringOption(option => option.setName('account').setDescription('Account to add to the list').setRequired(true)))
+        .addStringOption(option => option.setName('accounts').setDescription('Accounts to add to the list seperated by a comma').setRequired(true)))
 	  .addSubcommand(subcommand =>
 		  subcommand.setName('delete')
 		    .setDescription('removes an account from a list')
@@ -38,8 +38,8 @@ module.exports = {
   async execute(client, interaction) {
     if(interaction.options.getSubcommand() == 'new') {
       addNewAccount(interaction);
-    } else if(interaction.options.getSubcommand() == 'add') {
-      addAccountToList(interaction);
+    } else if(interaction.options.getSubcommand() == 'add-to-list') {
+      addAccounts(interaction);
     } else if(interaction.options.getSubcommand() == 'delete') {
       removeAccountFromList(interaction);
     } else if(interaction.options.getSubcommand() == 'update') {
@@ -62,24 +62,19 @@ function addNewAccount(interaction) {
   interaction.reply({ content: 'Account added.', ephemeral: true });
 }
 
-function addAccountToList(interaction) {
-  var lists = accTrack.getLists();
-  var accounts = accTrack.getAccounts();
+function addAccounts(interaction) {
   var list = accTrack.getListName(interaction.options.getString('list'));
-  var account = accTrack.getAccountName(interaction.options.getString('account'), lists[list].game);
-  if(accTrack.listExists(list)) {
-    if(account) {
-      lists[list].accounts.push(account);
-    } else {
-      interaction.reply({ content: 'Account does not exist.', ephemeral: true });
-      return;
-    }
-  } else {
+  if(!list) {
     interaction.reply({ content: 'List does not exist.', ephemeral: true });
     return;
   }
-  accTrack.setLists(lists);
-  interaction.reply({ content: 'Account added to list.', ephemeral: true });
+  var accsToAdd = interaction.options.getString('accounts').split(',');
+  errorAdding = accTrack.addAccountsToList(accsToAdd, list);
+  var returnMsg = 'List Updated.';
+  errorAdding.forEach(acc => {
+    returnMsg += '\nError adding ' + acc;
+  });
+  interaction.reply({ content: returnMsg, ephemeral: true });
 }
 
 function removeAccountFromList(interaction) {

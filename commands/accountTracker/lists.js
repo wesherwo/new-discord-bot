@@ -14,7 +14,8 @@ module.exports = {
 					.addChoices({name: 'Valorant', value: 'valorant'},
 					            {name: 'Rocket League', value: 'rocket-league'},
 					            {name: 'Overwatch', value: 'overwatch'})
-					.setRequired(true)))
+					.setRequired(true))
+      .addStringOption(option => option.setName('accounts').setDescription('List of account seperated by a comma')))
 		.addSubcommand(subcommand =>
 			subcommand.setName('delete')
 			.setDescription('Deletes an account list')
@@ -45,7 +46,15 @@ function makeList(interaction) {
     return;
   }
   accTrack.setLists(lists);
-  interaction.reply({ content: 'List created.', ephemeral: true });
+  var returnMsg = 'List created.';
+  if(interaction.options.getString('accounts')) {
+    var accsToAdd = interaction.options.getString('accounts').split(',');
+    errorAdding = accTrack.addAccountsToList(accsToAdd, list);
+    errorAdding.forEach(acc => {
+      returnMsg += '\nError adding ' + acc;
+    });
+  }
+  interaction.reply({ content: returnMsg, ephemeral: true });
 }
 
 function deleteList(interaction) {

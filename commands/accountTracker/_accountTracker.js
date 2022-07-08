@@ -11,7 +11,7 @@ module.exports = {
 	async execute(client, interaction) {
 		let embed = new MessageEmbed();
         embed.setColor(3447003).setTitle('List of commands').addFields(
-            [{ name: 'at-account add', value: 'Add an account to a list' },
+            [{ name: 'at-account add-to-list', value: 'Add an account to a list' },
             { name: 'at-account delete', value: 'Delete an account' },
             { name: 'at-account new', value: 'Create a new account' },
             { name: 'at-account update', value: 'Update a accounts rank' },
@@ -76,4 +76,27 @@ module.exports.getAccountName = (account, game) => {
         }
     });
     return accountName;
+}
+
+module.exports.addAccountsToList = (accounts, list) => {
+    var errorAdding = [];
+    var lists = JSON.parse(fs.readFileSync(listPath));
+    accounts.forEach(acc => {
+        if(acc) {
+            var accountName = null;
+            Object.keys(JSON.parse(fs.readFileSync(accountsPath))[lists[list].game]).forEach(a => {
+                if(a.toLowerCase().localeCompare(acc.toLowerCase().trim()) == 0) {
+                    accountName = a;
+                }
+            });
+            if(accountName) {
+                lists[list].accounts.push(accountName);
+            } else {
+                errorAdding.push(acc);
+            }
+        }
+    });
+    var jsonData = JSON.stringify(lists);
+    fs.writeFileSync(listPath, jsonData, function (err) { if (err) { console.log(err); } });
+    return errorAdding;
 }
