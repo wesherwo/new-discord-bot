@@ -39,7 +39,9 @@ function printLists(interaction) {
     }
     var toSend = [];
     toSend.push('```xl');
-    Object.keys(lists).sort().forEach(list => toSend.push(list + ' - ' + lists[list].game))
+    Object.keys(lists).sort(function (a, b) { 
+                                return a.toLocaleLowerCase().localeCompare(b.toLocaleLowerCase()) 
+                            }).forEach(list => toSend.push(list + ' - ' + lists[list].game))
 	toSend.push('```');
 	interaction.reply(toSend.join('\n'));
 }
@@ -55,7 +57,9 @@ function printList(interaction) {
         }
         var toSend = [];
         toSend.push('```xl');
-        lists[list].accounts.sort().forEach(account => toSend.push(account + ' - ' + accounts[lists[list].game][account]));
+        lists[list].accounts.sort(function (a, b) {
+                                    return a.toLocaleLowerCase().localeCompare(b.toLocaleLowerCase()) 
+                                }).forEach(account => toSend.push(account + ' - ' + accounts[lists[list].game][account]));
         toSend.push('```');
 	    interaction.reply(toSend.join('\n'));
     } else {

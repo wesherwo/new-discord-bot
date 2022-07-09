@@ -11,9 +11,10 @@ module.exports = {
 	async execute(client, interaction) {
 		let embed = new MessageEmbed();
         embed.setColor(3447003).setTitle('List of commands').addFields(
-            [{ name: 'at-account add-to-list', value: 'Add an account to a list' },
+            [{ name: 'at-account add-to-list', value: 'Add accounts to a list' },
             { name: 'at-account delete', value: 'Delete an account' },
             { name: 'at-account new', value: 'Create a new account' },
+            { name: 'at-account remove-from-list', value: 'Remove accounts from a list' },
             { name: 'at-account update', value: 'Update a accounts rank' },
             { name: 'at-list create', value: 'Creates a new list' },
             { name: 'at-list delete', value: 'Deletes a list' },
