@@ -51,7 +51,7 @@ async function ping (interaction, newInteraction) {
         pingTime.setSeconds(0);
         var dateString = pingTime.toLocaleString();
         dateString = dateString.substring(0,dateString.indexOf(':00')) + dateString.substring(dateString.indexOf(':00') + 3);
-        interaction.reply(`React to this message to be pinged at ${dateString} for:\n` + interaction.options.getString('message'));
+        interaction.reply(`React to this message to be pinged at ${dateString} for:\n\n` + interaction.options.getString('message'));
         message = await interaction.fetchReply();
         reminders[message.id] = message.channel.id;
         var jsonData = JSON.stringify(reminders);
