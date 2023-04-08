@@ -50,6 +50,14 @@ async function ping (interaction, newInteraction) {
         pingTime.setMinutes(interaction.options.getInteger('minute'));
         pingTime.setSeconds(0);
         var dateString = pingTime.toLocaleString();
+        var currTime = new Date();
+        var timer = pingTime.getTime() - currTime.getTime();
+        if(timer < 0){
+            interaction.reply({ content: 'Must be a time in the future', ephemeral: true });
+            console.log('Must be a time in the future.  Ping has been deleted.');
+            deletePing(interaction);
+            return;
+        }
         dateString = dateString.substring(0,dateString.indexOf(':00')) + dateString.substring(dateString.indexOf(':00') + 3);
         interaction.reply(`React to this message to be pinged at ${dateString} for:\n\n` + interaction.options.getString('message'));
         message = await interaction.fetchReply();
@@ -57,15 +65,13 @@ async function ping (interaction, newInteraction) {
         var jsonData = JSON.stringify(reminders);
         fs.writeFileSync(path, jsonData, function (err) { if (err) { console.log(err); } });
     } else {
-        pingTime.setTime(Date.parse(interaction.content.substring(interaction.content.indexOf('at')+3, interaction.content.indexOf('for:')).trim()));
+        date = interaction.content.substring(interaction.content.indexOf('at')+3, interaction.content.indexOf('for:')).trim().replaceAll(" "," ");
+        pingTime.setTime(Date.parse(date));
     }
 
     var currTime = new Date();
     var timer = pingTime.getTime() - currTime.getTime();
     if(timer < 0){
-        if(newInteraction) {
-            interaction.reply({ content: 'Must be a time in the future', ephemeral: true });
-        }
         console.log('Must be a time in the future.  Ping has been deleted.');
         deletePing(interaction);
         return;
@@ -85,12 +91,12 @@ async function ping (interaction, newInteraction) {
 function pingNow(message) {
     var messaged = {};
     message.reactions.cache.each(reaction => {
-        reaction.users.cache.each(user => {
+        reaction.users.fetch().then(getUsers => getUsers.each(user => {
             if(messaged[user.username] == undefined){
                 messaged[user.username] = true;
                 user.send(message.content.substring(message.content.indexOf('\n')+1).trim());
             }
-        })
+        }));
     });
     deletePing(message);
 }
