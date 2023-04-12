@@ -57,12 +57,15 @@ function defaultName(interaction) {
 function addHolidayName(interaction) {
     var names = getHolidayNames();
     var userNames = names[interaction.user.id];
+    if(!userNames) {
+        userNames = {};
+    }
     if(!holidayExists(interaction.options.getString('holiday'))) {
         interaction.reply({ content: 'That holiday has not been added yet', ephemeral: true });
         return;
     }
     if(userNames) {
-        if(userNames[interaction.options.getString('holiday')]) {
+        if(userNames[interaction.options.getString('holiday').toLowerCase().trim()]) {
             interaction.reply({ content: 'You already have a nickname for this holiday.  Use the replace command to change', ephemeral: true });
             return;
         }
@@ -84,11 +87,11 @@ function changeHolidayName(interaction) {
         interaction.reply({ content: "You don't have any holiday names", ephemeral: true });
         return;
     }
-    if(!userNames[interaction.options.getString('holiday')]) {
+    if(!userNames[interaction.options.getString('holiday').toLowerCase().trim()]) {
         interaction.reply({ content: "You don't have a nickname for this holiday", ephemeral: true });
         return;
     }
-    userNames[interaction.options.getString('holiday')] = interaction.options.getString('name');
+    userNames[interaction.options.getString('holiday').toLowerCase().trim()] = interaction.options.getString('name');
     names[interaction.user.id] = userNames;
     setHolidayNames(names);
     interaction.reply({ content: 'Holiday name has been changed', ephemeral: true });
