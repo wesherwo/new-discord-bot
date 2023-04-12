@@ -70,7 +70,7 @@ function addHolidayName(interaction) {
             return;
         }
     }
-    userNames[interaction.options.getString('holiday')] = interaction.options.getString('name');
+    userNames[interaction.options.getString('holiday').toLowerCase().trim()] = interaction.options.getString('name');
     names[interaction.user.id] = userNames;
     setHolidayNames(names);
     interaction.reply({ content: 'Holiday name has been added', ephemeral: true });
@@ -108,11 +108,11 @@ function removeHolidayName(interaction) {
         interaction.reply({ content: "You don't have any holiday names", ephemeral: true });
         return;
     }
-    if(!userNames[interaction.options.getString('holiday')]) {
+    if(!userNames[interaction.options.getString('holiday').toLowerCase().trim()]) {
         interaction.reply({ content: "You don't have a nickname for this holiday", ephemeral: true });
         return;
     }
-    delete userNames[interaction.options.getString('holiday')];
+    delete userNames[interaction.options.getString('holiday').toLowerCase().trim()];
     names[interaction.user.id] = userNames;
     setHolidayNames(names);
     interaction.reply({ content: 'Holiday name has been removed', ephemeral: true });
