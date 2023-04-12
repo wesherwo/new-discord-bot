@@ -127,8 +127,8 @@ function printNames(interaction) {
         return;
     }
     holidays.forEach(holiday => {
-        if(names[interaction.user.id][holiday]) {
-            output += holiday['name'] + ' - ' + names[interaction.user.id][holiday] + '\n';
+        if(names[interaction.user.id][holiday['name'].toLowerCase().trim()]) {
+            output += holiday['name'] + ' - ' + names[interaction.user.id][holiday['name'].toLowerCase().trim()] + '\n';
         } else {
             output += holiday['name'] + ' - ' + 'No name set' + '\n';
         }
