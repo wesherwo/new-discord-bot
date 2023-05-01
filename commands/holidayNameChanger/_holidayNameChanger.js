@@ -34,7 +34,7 @@ module.exports.startup = (client) => {
 
 function runEachHour() {
     var withinHoliday = isHoliday();
-    if(withinHoliday != currentHoliday) {
+    if(withinHoliday.localeCompare(currentHoliday) != 0) {
         currentHoliday = withinHoliday;
         updateHolidayNames(withinHoliday);
     }
@@ -53,7 +53,7 @@ function isHoliday() {
         var compareEndDate = new Date();
         compareEndDate.setMonth(holidays[holiday]['end-month'] - 1);
         compareEndDate.setDate(holidays[holiday]['end-day']);
-        if((date.getTime() - compareStartDate.getTime() >= 0) && (date.getTime() - compareEndDate.getTime() <= 0)) {
+        if((compareStartDate.getTime() - date.getTime() >= 0) && (date.getTime() - compareEndDate.getTime() <= 0)) {
             withinHoliday = holiday;
         }
     });
