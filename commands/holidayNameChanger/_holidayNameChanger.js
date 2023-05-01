@@ -3,6 +3,7 @@ const { MessageEmbed } = require('discord.js');
 const fs = require('node:fs');
 const holidaysPath = 'saveData/holidays.json';
 const holidayNamesPath = 'saveData/holidayNames.json';
+const holidayRolesPath = 'saveData/holidayRoles.json';
 var bot;
 var currentHoliday;
 
@@ -34,6 +35,7 @@ module.exports.startup = (client) => {
 function runEachHour() {
     var withinHoliday = isHoliday();
     if(withinHoliday != currentHoliday) {
+        currentHoliday = withinHoliday;
         updateHolidayNames(withinHoliday);
     }
     setTimeout(runEachHour, 360000);
@@ -82,6 +84,12 @@ module.exports.getHolidayNames = () => { return JSON.parse(fs.readFileSync(holid
 module.exports.setHolidayNames = (names) => { 
     var jsonData = JSON.stringify(names);
     fs.writeFileSync(holidayNamesPath, jsonData, function (err) { if (err) { console.log(err); } });
+}
+
+module.exports.getHolidayRoles = () => { return JSON.parse(fs.readFileSync(holidayRolesPath));}
+module.exports.setHolidayRoles = (roles) => { 
+    var jsonData = JSON.stringify(roles);
+    fs.writeFileSync(holidayRolesPath, jsonData, function (err) { if (err) { console.log(err); } });
 }
 
 module.exports.holidayExists = (holiday) => {
