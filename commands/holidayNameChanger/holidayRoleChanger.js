@@ -10,19 +10,22 @@ module.exports = {
 			subcommand.setName('default')
 				.setDescription('Sets a default nickname when it is not a holiday')
                 .addRoleOption(option => option.setName('role').setDescription('Role for the name').setRequired(true))
-                .addStringOption(option => option.setName('name').setDescription('Roles name for when its not a holiday').setRequired(true)))
+                .addStringOption(option => option.setName('name').setDescription('Roles name for when its not a holiday').setRequired(true))
+                .addStringOption(option => option.setName('color').setDescription('Roles color for when its not a holiday(hex #FF0000)')))
         .addSubcommand(subcommand =>
 			subcommand.setName('add')
 				.setDescription('Adds a new nickname for a holiday')
                 .addStringOption(option => option.setName('holiday').setDescription('Holiday for the name change').setRequired(true))
                 .addRoleOption(option => option.setName('role').setDescription('Role for the name').setRequired(true))
-                .addStringOption(option => option.setName('name').setDescription('Roles name for the holiday').setRequired(true)))
+                .addStringOption(option => option.setName('name').setDescription('Roles name for the holiday').setRequired(true))
+                .addStringOption(option => option.setName('color').setDescription('Roles color for the holiday')))
         .addSubcommand(subcommand =>
             subcommand.setName('replace')
                 .setDescription('Replaces a nickname for a holiday')
                 .addStringOption(option => option.setName('holiday').setDescription('Holiday for the name change').setRequired(true))
                 .addRoleOption(option => option.setName('role').setDescription('Role for the new name').setRequired(true))
-                .addStringOption(option => option.setName('name').setDescription('Roles new name for the holiday').setRequired(true)))
+                .addStringOption(option => option.setName('name').setDescription('Roles new name for the holiday').setRequired(true))
+                .addStringOption(option => option.setName('color').setDescription('Roles new color for the holiday')))
         .addSubcommand(subcommand =>
             subcommand.setName('remove')
                 .setDescription('Removes a nickname for a holiday')
@@ -52,17 +55,17 @@ module.exports.startup = (client) => {
 }
 
 function defaultName(interaction) {
-    var roles = setDefaultName(getHolidayRoles(), interaction.options.getRole('role').id, interaction.options.getString('name'), interaction);
+    var roles = setDefaultName(getHolidayRoles(), interaction.options.getRole('role').id, interaction.options.getString('name'), interaction, interaction.options.getString('color') ?? undefined);
     setHolidayRoles(roles);
 }
 
 function addHolidayName(interaction) {
-    var names = addName(getHolidayRoles(), interaction.options.getRole('role').id, interaction.options.getString('holiday').toLowerCase().trim(), interaction.options.getString('name'), interaction);
+    var names = addName(getHolidayRoles(), interaction.options.getRole('role').id, interaction.options.getString('holiday').toLowerCase().trim(), interaction.options.getString('name'), interaction, interaction.options.getString('color') ?? undefined);
     setHolidayRoles(names);
 }
 
 function changeHolidayName(interaction) {
-    var names = changeName(getHolidayRoles(), interaction.options.getRole('role').id, interaction.options.getString('holiday').toLowerCase().trim(), interaction.options.getString('name'), interaction);
+    var names = changeName(getHolidayRoles(), interaction.options.getRole('role').id, interaction.options.getString('holiday').toLowerCase().trim(), interaction.options.getString('name'), interaction, interaction.options.getString('color') ?? undefined);
     setHolidayRoles(names);
 }
 
