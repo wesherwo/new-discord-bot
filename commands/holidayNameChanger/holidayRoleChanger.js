@@ -1,5 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { getHolidayNames, setHolidayNames, getHolidayRoles, setHolidayRoles, holidayExists, sortedHolidays } = require('./_holidayNameChanger');
+const { getHolidayRoles, setHolidayRoles, setDefaultName, addName, changeName, removeName, printNames } = require('./_holidayNameChanger');
+var bot;
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -41,103 +42,42 @@ module.exports = {
 		} else if (interaction.options.getSubcommand() == 'remove') {
 			removeHolidayName(interaction);
 		} else if (interaction.options.getSubcommand() == 'print') {
-			printNames(interaction);
+			printHolidayRoles(interaction);
 		}
 	},
 };
 
+module.exports.startup = (client) => {
+    bot = client;
+}
+
 function defaultName(interaction) {
-    console.log(interaction.options.getRole('role'));
-    var roles = getHolidayRoles();
-    var roleNames = roles[interaction.options.getRole('role')];
-    if(!roleNames) {
-        roleNames = {};
-    }
-    roleNames['default'] = interaction.options.getString('name');
-    roles[interaction.options.getRole('role')] = roleNames;
+    var roles = setDefaultName(getHolidayRoles(), interaction.options.getRole('role').id, interaction.options.getString('name'), interaction);
     setHolidayRoles(roles);
-    interaction.reply({ content: 'Default name has been added/updated', ephemeral: true });
 }
 
 function addHolidayName(interaction) {
-    var roles = getHolidayRoles();
-    var roleNames = roles[interaction.options.getRole('role')];
-    if(!roleNames) {
-        roleNames = {};
-    }
-    if(!holidayExists(interaction.options.getString('holiday'))) {
-        interaction.reply({ content: 'That holiday has not been added yet', ephemeral: true });
-        return;
-    }
-    if(roleNames) {
-        if(roleNames[interaction.options.getString('holiday').toLowerCase().trim()]) {
-            interaction.reply({ content: 'That role already has a name for this holiday.  Use the replace command to change', ephemeral: true });
-            return;
-        }
-    }
-    roleNames[interaction.options.getString('holiday').toLowerCase().trim()] = interaction.options.getString('name');
-    roles[interaction.options.getRole('role')] = roleNames;
+    var names = addName(getHolidayRoles(), interaction.options.getRole('role').id, interaction.options.getString('holiday').toLowerCase().trim(), interaction.options.getString('name'), interaction);
     setHolidayRoles(names);
-    interaction.reply({ content: 'Holiday name has been added', ephemeral: true });
 }
 
 function changeHolidayName(interaction) {
-    var roles = getHolidayRoles();
-    var roleNames = roles[interaction.options.getRole('role')];
-    if(!holidayExists(interaction.options.getString('holiday'))) {
-        interaction.reply({ content: 'That holiday does not exist', ephemeral: true });
-        return;
-    }
-    if(!roleNames) {
-        interaction.reply({ content: "That role doesn't have any holiday names", ephemeral: true });
-        return;
-    }
-    if(!roleNames[interaction.options.getString('holiday').toLowerCase().trim()]) {
-        interaction.reply({ content: "That role doesn't have a name for this holiday", ephemeral: true });
-        return;
-    }
-    roleNames[interaction.options.getString('holiday').toLowerCase().trim()] = interaction.options.getString('name');
-    roles[interaction.options.getRole('role')] = roleNames;
-    setHolidayRoles(roles);
-    interaction.reply({ content: 'Holiday name has been changed', ephemeral: true });
+    var names = changeName(getHolidayRoles(), interaction.options.getRole('role').id, interaction.options.getString('holiday').toLowerCase().trim(), interaction.options.getString('name'), interaction);
+    setHolidayRoles(names);
 }
 
 function removeHolidayName(interaction) {
-    var roles = getHolidayRoles();
-    var roleNames = roles[interaction.options.getRole('role')];
-    if(!holidayExists(interaction.options.getString('holiday'))) {
-        interaction.reply({ content: 'That holiday does not exist', ephemeral: true });
-        return;
-    }
-    if(!roleNames) {
-        interaction.reply({ content: "That role doesn't have any holiday names", ephemeral: true });
-        return;
-    }
-    if(!roleNames[interaction.options.getString('holiday').toLowerCase().trim()]) {
-        interaction.reply({ content: "That role doesn't have a name for this holiday", ephemeral: true });
-        return;
-    }
-    delete roleNames[interaction.options.getString('holiday').toLowerCase().trim()];
-    roles[interaction.options.getRole('role')] = roleNames;
-    setHolidayRoles(roles);
-    interaction.reply({ content: 'Holiday name has been removed', ephemeral: true });
+    var names = removeName(getHolidayRoles(), interaction.options.getRole('role').id, interaction.options.getString('holiday').toLowerCase().trim(), interaction);
+    setHolidayRoles(names);
 }
 
-function printNames(interaction) {
-    var holidays = sortedHolidays();
-    var names = getHolidayRoles();
+function printHolidayRoles(interaction) {
+    var roles = getHolidayRoles();
+    var guild = bot.guilds.cache.at(0);
+    var sortedIDs = Object.keys(roles).sort(function (a, b) { return guild.roles.cache.find(val => val.id === b).position - guild.roles.cache.find(val => val.id === a).position});
     var output = '';
-    if(!names[interaction.options.getRole('role')]) {
-        interaction.reply({ content: "That role doesn't have any holiday names", ephemeral: true });
-        return;
-    }
-    holidays.forEach(holiday => {
-        if(names[interaction.options.getRole('role')][holiday['name'].toLowerCase().trim()]) {
-            output += holiday['name'] + ' - ' + names[interaction.options.getRole('role')][holiday['name'].toLowerCase().trim()] + '\n';
-        } else {
-            output += holiday['name'] + ' - ' + 'No name set' + '\n';
-        }
+    sortedIDs.forEach(id => {
+        output += '**' + guild.roles.cache.find(val => val.id === id).name + '**\n' + printNames(roles[id]) + '\n\n';
     });
-    output += 'Default' + ' - ' + names[interaction.options.getRole('role')]['default'];
     interaction.reply({ content: output.trim(), ephemeral: true });
 }

@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { getHolidayNames, setHolidayNames, holidayExists, sortedHolidays } = require('./_holidayNameChanger');
+const { getHolidayNames, setHolidayNames, setDefaultName, addName, changeName, removeName, printNames } = require('./_holidayNameChanger');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -37,102 +37,37 @@ module.exports = {
 		} else if (interaction.options.getSubcommand() == 'remove') {
 			removeHolidayName(interaction);
 		} else if (interaction.options.getSubcommand() == 'print') {
-			printNames(interaction);
+			printHolidayNames(interaction);
 		}
 	},
 };
 
 function defaultName(interaction) {
-    var names = getHolidayNames();
-    var userNames = names[interaction.user.id];
-    if(!userNames) {
-        userNames = {};
-    }
-    userNames['default'] = interaction.options.getString('name');
-    names[interaction.user.id] = userNames;
+    var names = setDefaultName(getHolidayNames(), interaction.user.id, interaction.options.getString('name'), interaction);
     setHolidayNames(names);
-    interaction.reply({ content: 'Default name has been added/updated', ephemeral: true });
 }
 
 function addHolidayName(interaction) {
-    var names = getHolidayNames();
-    var userNames = names[interaction.user.id];
-    if(!userNames) {
-        userNames = {};
-    }
-    if(!holidayExists(interaction.options.getString('holiday'))) {
-        interaction.reply({ content: 'That holiday has not been added yet', ephemeral: true });
-        return;
-    }
-    if(userNames) {
-        if(userNames[interaction.options.getString('holiday').toLowerCase().trim()]) {
-            interaction.reply({ content: 'You already have a nickname for this holiday.  Use the replace command to change', ephemeral: true });
-            return;
-        }
-    }
-    userNames[interaction.options.getString('holiday').toLowerCase().trim()] = interaction.options.getString('name');
-    names[interaction.user.id] = userNames;
+    var names = addName(getHolidayNames(), interaction.user.id, interaction.options.getString('holiday').toLowerCase().trim(), interaction.options.getString('name'), interaction);
     setHolidayNames(names);
-    interaction.reply({ content: 'Holiday name has been added', ephemeral: true });
 }
 
 function changeHolidayName(interaction) {
-    var names = getHolidayNames();
-    var userNames = names[interaction.user.id];
-    if(!holidayExists(interaction.options.getString('holiday'))) {
-        interaction.reply({ content: 'That holiday does not exist', ephemeral: true });
-        return;
-    }
-    if(!userNames) {
-        interaction.reply({ content: "You don't have any holiday names", ephemeral: true });
-        return;
-    }
-    if(!userNames[interaction.options.getString('holiday').toLowerCase().trim()]) {
-        interaction.reply({ content: "You don't have a nickname for this holiday", ephemeral: true });
-        return;
-    }
-    userNames[interaction.options.getString('holiday').toLowerCase().trim()] = interaction.options.getString('name');
-    names[interaction.user.id] = userNames;
+    var names = changeName(getHolidayNames(), interaction.user.id, interaction.options.getString('holiday').toLowerCase().trim(), interaction.options.getString('name'), interaction);
     setHolidayNames(names);
-    interaction.reply({ content: 'Holiday name has been changed', ephemeral: true });
 }
 
 function removeHolidayName(interaction) {
-    var names = getHolidayNames();
-    var userNames = names[interaction.user.id];
-    if(!holidayExists(interaction.options.getString('holiday'))) {
-        interaction.reply({ content: 'That holiday does not exist', ephemeral: true });
-        return;
-    }
-    if(!userNames) {
-        interaction.reply({ content: "You don't have any holiday names", ephemeral: true });
-        return;
-    }
-    if(!userNames[interaction.options.getString('holiday').toLowerCase().trim()]) {
-        interaction.reply({ content: "You don't have a nickname for this holiday", ephemeral: true });
-        return;
-    }
-    delete userNames[interaction.options.getString('holiday').toLowerCase().trim()];
-    names[interaction.user.id] = userNames;
+    var names = removeName(getHolidayNames(), interaction.user.id, interaction.options.getString('holiday').toLowerCase().trim(), interaction);
     setHolidayNames(names);
-    interaction.reply({ content: 'Holiday name has been removed', ephemeral: true });
 }
 
-function printNames(interaction) {
-    var holidays = sortedHolidays();
+function printHolidayNames(interaction) {
     var names = getHolidayNames();
-    var output = '';
     if(!names[interaction.user.id]) {
         interaction.reply({ content: "You don't have any holiday names", ephemeral: true });
         return;
     }
-    holidays.forEach(holiday => {
-        if(names[interaction.user.id][holiday['name'].toLowerCase().trim()]) {
-            output += holiday['name'] + ' - ' + names[interaction.user.id][holiday['name'].toLowerCase().trim()] + '\n';
-        } else {
-            output += holiday['name'] + ' - ' + 'No name set' + '\n';
-        }
-    });
-    output += 'Default' + ' - ' + names[interaction.user.id]['default'];
+    var output = printNames(names[interaction.user.id]);
     interaction.reply({ content: output.trim(), ephemeral: true });
 }

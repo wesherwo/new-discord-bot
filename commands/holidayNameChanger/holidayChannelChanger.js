@@ -1,31 +1,32 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { getHolidayNames, setHolidayNames, getHolidayRoles, setHolidayRoles, holidayExists, sortedHolidays } = require('./_holidayNameChanger');
+const { getHolidayChannels, setHolidayChannels, setDefaultName, addName, changeName, removeName, printNames } = require('./_holidayNameChanger');
+var bot;
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('holiday-role')
-		.setDescription('Edit holiday names for a role')
+		.setName('holiday-channel')
+		.setDescription('Edit holiday names for a channel')
         .addSubcommand(subcommand =>
 			subcommand.setName('default')
-				.setDescription('Sets a default nickname when it is not a holiday')
+				.setDescription('Sets a default channel name when it is not a holiday')
                 .addChannelOption(option => option.setName('channel').setDescription('Channel for the name').setRequired(true))
                 .addStringOption(option => option.setName('name').setDescription('Roles name for when its not a holiday').setRequired(true)))
         .addSubcommand(subcommand =>
 			subcommand.setName('add')
-				.setDescription('Adds a new nickname for a holiday')
+				.setDescription('Adds a new channel name for a holiday')
                 .addStringOption(option => option.setName('holiday').setDescription('Holiday for the name change').setRequired(true))
                 .addChannelOption(option => option.setName('channel').setDescription('Channel for the name').setRequired(true))
                 .addStringOption(option => option.setName('name').setDescription('Channels name for the holiday').setRequired(true)))
         .addSubcommand(subcommand =>
             subcommand.setName('replace')
-                .setDescription('Replaces a nickname for a holiday')
+                .setDescription('Replaces a channel name for a holiday')
                 .addStringOption(option => option.setName('holiday').setDescription('Holiday for the name change').setRequired(true))
                 .addChannelOption(option => option.setName('channel').setDescription('Channel for the new name').setRequired(true))
                 .addStringOption(option => option.setName('name').setDescription('Roles new name for the holiday').setRequired(true)))
         .addSubcommand(subcommand =>
             subcommand.setName('remove')
-                .setDescription('Removes a nickname for a holiday')
-                .addChannelOption(option => option.setName('role').setDescription('Role to remove name').setRequired(true))
+                .setDescription('Removes a channel name for a holiday')
+                .addChannelOption(option => option.setName('channel').setDescription('Channel to remove name').setRequired(true))
                 .addStringOption(option => option.setName('holiday').setDescription('Holiday for the name change').setRequired(true)))
         .addSubcommand(subcommand =>
             subcommand.setName('print')
@@ -41,103 +42,42 @@ module.exports = {
 		} else if (interaction.options.getSubcommand() == 'remove') {
 			removeHolidayName(interaction);
 		} else if (interaction.options.getSubcommand() == 'print') {
-			printNames(interaction);
+			printHolidayChannels(interaction);
 		}
 	},
 };
 
+module.exports.startup = (client) => {
+    bot = client;
+}
+
 function defaultName(interaction) {
-    console.log(interaction.options.getRole('role'));
-    var roles = getHolidayRoles();
-    var roleNames = roles[interaction.options.getRole('role')];
-    if(!roleNames) {
-        roleNames = {};
-    }
-    roleNames['default'] = interaction.options.getString('name');
-    roles[interaction.options.getRole('role')] = roleNames;
-    setHolidayRoles(roles);
-    interaction.reply({ content: 'Default name has been added/updated', ephemeral: true });
+    var channels = setDefaultName(getHolidayChannels(), interaction.options.getChannel('channel').id, interaction.options.getString('name'), interaction);
+    setHolidayChannels(channels);
 }
 
 function addHolidayName(interaction) {
-    var roles = getHolidayRoles();
-    var roleNames = roles[interaction.options.getRole('role')];
-    if(!roleNames) {
-        roleNames = {};
-    }
-    if(!holidayExists(interaction.options.getString('holiday'))) {
-        interaction.reply({ content: 'That holiday has not been added yet', ephemeral: true });
-        return;
-    }
-    if(roleNames) {
-        if(roleNames[interaction.options.getString('holiday').toLowerCase().trim()]) {
-            interaction.reply({ content: 'That role already has a name for this holiday.  Use the replace command to change', ephemeral: true });
-            return;
-        }
-    }
-    roleNames[interaction.options.getString('holiday').toLowerCase().trim()] = interaction.options.getString('name');
-    roles[interaction.options.getRole('role')] = roleNames;
-    setHolidayRoles(names);
-    interaction.reply({ content: 'Holiday name has been added', ephemeral: true });
+    var names = addName(getHolidayChannels(), interaction.options.getChannel('channel').id, interaction.options.getString('holiday').toLowerCase().trim(), interaction.options.getString('name'), interaction);
+    setHolidayChannels(names);
 }
 
 function changeHolidayName(interaction) {
-    var roles = getHolidayRoles();
-    var roleNames = roles[interaction.options.getRole('role')];
-    if(!holidayExists(interaction.options.getString('holiday'))) {
-        interaction.reply({ content: 'That holiday does not exist', ephemeral: true });
-        return;
-    }
-    if(!roleNames) {
-        interaction.reply({ content: "That role doesn't have any holiday names", ephemeral: true });
-        return;
-    }
-    if(!roleNames[interaction.options.getString('holiday').toLowerCase().trim()]) {
-        interaction.reply({ content: "That role doesn't have a name for this holiday", ephemeral: true });
-        return;
-    }
-    roleNames[interaction.options.getString('holiday').toLowerCase().trim()] = interaction.options.getString('name');
-    roles[interaction.options.getRole('role')] = roleNames;
-    setHolidayRoles(roles);
-    interaction.reply({ content: 'Holiday name has been changed', ephemeral: true });
+    var names = changeName(getHolidayChannels(), interaction.options.getChannel('channel').id, interaction.options.getString('holiday').toLowerCase().trim(), interaction.options.getString('name'), interaction);
+    setHolidayChannels(names);
 }
 
 function removeHolidayName(interaction) {
-    var roles = getHolidayRoles();
-    var roleNames = roles[interaction.options.getRole('role')];
-    if(!holidayExists(interaction.options.getString('holiday'))) {
-        interaction.reply({ content: 'That holiday does not exist', ephemeral: true });
-        return;
-    }
-    if(!roleNames) {
-        interaction.reply({ content: "That role doesn't have any holiday names", ephemeral: true });
-        return;
-    }
-    if(!roleNames[interaction.options.getString('holiday').toLowerCase().trim()]) {
-        interaction.reply({ content: "That role doesn't have a name for this holiday", ephemeral: true });
-        return;
-    }
-    delete roleNames[interaction.options.getString('holiday').toLowerCase().trim()];
-    roles[interaction.options.getRole('role')] = roleNames;
-    setHolidayRoles(roles);
-    interaction.reply({ content: 'Holiday name has been removed', ephemeral: true });
+    var names = removeName(getHolidayChannels(), interaction.options.getChannel('channel').id, interaction.options.getString('holiday').toLowerCase().trim(), interaction);
+    setHolidayChannels(names);
 }
 
-function printNames(interaction) {
-    var holidays = sortedHolidays();
-    var names = getHolidayRoles();
+function printHolidayChannels(interaction) {
+    var channels = getHolidayChannels();
+    var guild = bot.guilds.cache.at(0);
+    var sortedIDs = Object.keys(channels).sort(function (a, b) { return guild.channels.cache.find(val => val.id === b).position - guild.channels.cache.find(val => val.id === a).position});
     var output = '';
-    if(!names[interaction.options.getRole('role')]) {
-        interaction.reply({ content: "That role doesn't have any holiday names", ephemeral: true });
-        return;
-    }
-    holidays.forEach(holiday => {
-        if(names[interaction.options.getRole('role')][holiday['name'].toLowerCase().trim()]) {
-            output += holiday['name'] + ' - ' + names[interaction.options.getRole('role')][holiday['name'].toLowerCase().trim()] + '\n';
-        } else {
-            output += holiday['name'] + ' - ' + 'No name set' + '\n';
-        }
+    sortedIDs.forEach(id => {
+        output += '**' + guild.channels.cache.find(val => val.id === id).name + '**\n' + printNames(channels[id]) + '\n\n';
     });
-    output += 'Default' + ' - ' + names[interaction.options.getRole('role')]['default'];
     interaction.reply({ content: output.trim(), ephemeral: true });
 }

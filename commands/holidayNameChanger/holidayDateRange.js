@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { getHolidays, setHolidays, sortedHolidays , holidayExists } = require('./_holidayNameChanger');
+const { getHolidays, setHolidays, getSortedHolidays , holidayExists } = require('./_holidayNameChanger');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -43,7 +43,9 @@ module.exports = {
 };
 
 function makeHoliday(interaction) {
-    if(holidayExists(interaction.options.getString('holiday'))) {
+    var holidays = getHolidays();
+    var newHolidayName = interaction.options.getString('holiday').toLowerCase().trim();
+    if(holidays[newHolidayName]) {
         interaction.reply({ content: 'Holiday already exists', ephemeral: true });
         return;
     }
@@ -79,14 +81,15 @@ function makeHoliday(interaction) {
         return;
     }
 
-    var holidays = getHolidays();
-    holidays[interaction.options.getString('holiday').toLowerCase().trim()] = {"name":interaction.options.getString('holiday'),"start-month":startMonth,"start-day":startDay,"end-month":endMonth,"end-day":endDay};
+    holidays[newHolidayName] = {"name":interaction.options.getString('holiday'),"start-month":startMonth,"start-day":startDay,"end-month":endMonth,"end-day":endDay};
     setHolidays(holidays);
     interaction.reply({ content: 'Holiday created', ephemeral: true });
 }
 
 function editHoliday(interaction) {
-    if(!holidayExists(interaction.options.getString('holiday'))) {
+    var holidays = getHolidays();
+    var newHolidayName = interaction.options.getString('holiday').toLowerCase().trim();
+    if(!holidays[newHolidayName]) {
         interaction.reply({ content: 'Holiday does not exist', ephemeral: true });
         return;
     }
@@ -123,13 +126,13 @@ function editHoliday(interaction) {
     }
 
     var holidays = getHolidays();
-    holidays[interaction.options.getString('holiday').toLowerCase().trim()] = {"name":interaction.options.getString('holiday'),"start-month":startMonth,"start-day":startDay,"end-month":endMonth,"end-day":endDay};
+    holidays[newHolidayName] = {"name":interaction.options.getString('holiday'),"start-month":startMonth,"start-day":startDay,"end-month":endMonth,"end-day":endDay};
     setHolidays(holidays);
     interaction.reply({ content: 'Holiday range changed', ephemeral: true });
 }
 
 function printHolidays(interaction) {
-    var holidays = sortedHolidays();
+    var holidays = getSortedHolidays();
     var output = '';
     holidays.forEach(holiday => {
         output += holiday['name'] + ' - ' + holiday['start-month'] + '/' + holiday['start-day'] + '-' + holiday['end-month'] + '/' + holiday['end-day'] + '\n';
@@ -138,12 +141,13 @@ function printHolidays(interaction) {
 }
 
 function removeHoliday(interaction) {
-    if(!holidayExists(interaction.options.getString('holiday'))) {
+    var holidays = getHolidays();
+    var newHolidayName = interaction.options.getString('holiday').toLowerCase().trim();
+    if(!holidays[newHolidayName]) {
         interaction.reply({ content: 'Holiday does not exist', ephemeral: true });
         return;
     }
-    var holidays = getHolidays();
-    delete holidays[interaction.options.getString('holiday').toLowerCase().trim()];
+    delete holidays[newHolidayName];
     setHolidays(holidays);
     interaction.reply({ content: 'Holiday removed', ephemeral: true });
 }
