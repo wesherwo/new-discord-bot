@@ -40,7 +40,6 @@ module.exports = {
 
 module.exports.startup = (client) => {
     bot = client;
-    updateNames();
     setTimeout(runEachHour, 6000);
 }
 
