@@ -115,7 +115,7 @@ function updateHolidayRoles() {
 function updateHolidayChannels() {
     var holidayNames = JSON.parse(fs.readFileSync(holidayChannelsPath));
     Object.keys(holidayNames).forEach(id => {
-        var channel = bot.guilds.cache.at(0).Channels.cache.find(channel => channel.id == id);
+        var channel = bot.guilds.cache.at(0).channels.cache.find(channel => channel.id == id);
         if(holidayNames[id][currentHoliday]) {
             channel.setName(holidayNames[id][currentHoliday], 'Updated channel for ' + currentHoliday);
         } else if(holidayNames[id]['default']) {
