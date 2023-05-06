@@ -1,4 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
+const { ChannelType } = require('discord.js');
 
 var userChannelCategory;
 var channels = {};
@@ -17,8 +18,8 @@ module.exports.startup = (client) => {
     userChannelCategory = client.channels.cache.find(val => val.name === 'Join to create channel');
     if (userChannelCategory == null) {
         var guild = client.guilds.cache.at(0);
-        guild.channels.create('USER CHANNELS', { type: 'GUILD_CATEGORY' }).then(parent => {
-            guild.channels.create('Join to create channel', { type: 'GUILD_VOICE' }).then(chan => {
+        guild.channels.create({ name: 'USER CHANNELS', type: ChannelType.GuildCategory }).then(parent => {
+            guild.channels.create({ name: 'Join to create channel',  type: ChannelType.GuildVoice }).then(chan => {
                 chan.setParent(parent);
             });
         });
@@ -32,7 +33,7 @@ module.exports.startup = (client) => {
 }
 
 module.exports.getOwnedChannel = (member) => {
-    chans = userChannelCategory.parent.children;
+    chans = userChannelCategory.parent.children.cache;
     var foundChan = null;
     chans.each(chan => {
         if (channels[chan.id] != undefined && channels[chan.id].owner == member) {
@@ -59,7 +60,7 @@ function makeChannelByCommand(client, interaction) {
 }
 
 function makeChannel(client, member, name) {
-    client.guilds.cache.at(0).channels.create(name, { type: 'GUILD_VOICE' }).then(chan => { moveUser(member, chan); });
+    client.guilds.cache.at(0).channels.create({ name: name, type: ChannelType.GuildVoice }).then(chan => { moveUser(member, chan); });
 }
 
 function moveUser(member, chan) {

@@ -1,12 +1,12 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageEmbed } = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('music-help')
         .setDescription('Shows commands for music'),
     async execute(client, interaction) {
-        let embed = new MessageEmbed();
+        let embed = new EmbedBuilder();
         embed.setColor(3447003).setTitle('List of commands').addFields(
             [{ name: 'clear', value: 'Clears the current queue' },
             { name: 'jump', value: 'Jump to a specific track in the queue' },

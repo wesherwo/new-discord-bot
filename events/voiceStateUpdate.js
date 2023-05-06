@@ -1,4 +1,4 @@
-const { MessageEmbed } = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 
 module.exports = {
 	name: 'voiceStateUpdate',
@@ -6,7 +6,7 @@ module.exports = {
 		if (oldState.channel == newState.channel) {
             return;
         }
-        let embed = new MessageEmbed();
+        let embed = new EmbedBuilder();
         embed.setColor(13632027).setAuthor({name: oldState.member.user.username, iconURL: oldState.member.user.displayAvatarURL()}).setTimestamp();
         if (oldState.channel == null && newState.channel != null) {
             embed.setDescription(`<@${oldState.member.id}> joined voice channel <#${newState.member.voice.channel.id}>`);

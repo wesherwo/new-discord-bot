@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageEmbed } = require('discord.js');
+const { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } = require('discord.js');
 const fs = require('fs');
 var bot;
 var gameData = {};
@@ -13,8 +13,7 @@ TODO: add a way to add to games to ignore through a command and remove them from
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('server-game-info')
-        .setDescription('Displays the server game time played')
-        .addIntegerOption(option => option.setName('pages').setDescription('Number of pages to display')),
+        .setDescription('Displays the server game time played'),
     async execute(client, interaction) {
         printGameData(interaction);
     },
@@ -46,12 +45,6 @@ function calcGameData(ppl) {
     ppl.each(user => games = user.activities.forEach(game => {
         if (game.type == 'PLAYING') {
             var name = game.name;
-            // Check for who the fuck is playing a stupid ass game
-            if(name == '3DMark Demo' || name == 'Prose & Codes' || name == 'with ur mom' || name == 'Unreal Engine 5.1' || name == 'Cinema 4D'
-            || name == 'XSOverlay' || name == 'GDLauncher' || name == 'EVGA Precision X1' || name == 'DZSALauncher' || name == 'SteamVR Media Player'
-            || name == 'Unreal Engine' || name == 'Yu Crossing Animals') {
-                console.log(user.user.username + ' Playing ' + name);
-            }
             if (!gamesToIgnore.includes(name)) {
                 if (!gameData.hasOwnProperty(name)) {
                     gameData[name] = 1;
@@ -88,29 +81,80 @@ function printGameData(interaction) {
     }
     var max = sorted[0][1];
 
-    var pages = interaction.options.getInteger('pages') * 20;
-    if(!pages) {
-        pages = sorted.length;
-    }
-
-    var s = '';
-    let embed = new MessageEmbed();
+    var totalPages = Math.ceil(sorted.length / 20);
+    var embeds = [];
+    let embed = new EmbedBuilder();
+    var fields = 0;
     embed.setColor(3447003).setTitle(`Bot running for ${printTime(data.time)}`);
-    var page = 1;
-    for (var i = 0; i < sorted.length && i < pages; i++) {
-        s = '';
+    for (var i = 0; i < sorted.length; i++) {
+        var s = '';
         for (var j = 0; (j < (sorted[i][1] / max) * 40) || (j < 1); j++) {
             s += String.fromCharCode(10074);
         }
-        embed.addField(`${sorted[i][0]} - played for ${printTime(sorted[i][1])}`, s);
-        if ((embed.fields.length % 20 == 0 || i == sorted.length - 1) && embed.fields.length > 0) {
-            interaction.channel.send({ embeds: [embed] });
-            page++;
-            embed = new MessageEmbed();
-            embed.setColor(3447003).setTitle(`page ${page}`);
+        embed.addFields({name: `${sorted[i][0]} - played for ${printTime(sorted[i][1])}`, value: s});
+        fields++;
+        if ((fields % 20 == 0 || i == sorted.length - 1) && fields > 0) {
+            embeds.push(embed);
+            embed = new EmbedBuilder();
+            embed.setColor(3447003).setTitle(`Bot running for ${printTime(data.time)}`);
+            fields = 0;
         }
     }
-    interaction.reply({ content: 'Stats sent', ephemeral: true });
+
+    let currentPage = 0;
+
+    const prevButton = new ButtonBuilder()
+        .setCustomId("previous")
+        .setEmoji("<:previous:1081828598433992825>")
+        .setStyle(ButtonStyle.Primary);
+
+    var pageNum = new ButtonBuilder()
+        .setCustomId("pages")
+        .setLabel("Page 1" + "/" + totalPages)
+        .setStyle(ButtonStyle.Secondary)
+        .setDisabled(true);
+
+    const nextButton = new ButtonBuilder()
+        .setCustomId("next")
+        .setEmoji("<:next:1081828596844339251>")
+        .setStyle(ButtonStyle.Primary);
+
+    const buttons = new ActionRowBuilder()
+        .addComponents(prevButton, pageNum, nextButton);
+
+    interaction.reply({
+        embeds: [embeds[0]],
+        components: [buttons]
+    });
+
+    const collector = interaction.channel.createMessageComponentCollector({
+        filter: (i) => i.user.id === interaction.user.id,
+        time: 300000, // 5 minute timeout
+    });
+
+    collector.on("collect", (interaction) => {
+        if (interaction.customId === "previous") {
+            currentPage--;
+            if (currentPage < 0) currentPage = 0;
+            let embed = embeds[currentPage];
+            pageNum.setLabel("Page " + (currentPage + 1) + "/" + totalPages);
+            interaction.update({
+                embeds: [embed],
+                components: [buttons]
+            });
+        } else if (interaction.customId === "next") {
+            currentPage++;
+            if (currentPage >= totalPages) currentPage = totalPages - 1;
+            let embed = embeds[currentPage];
+            pageNum.setLabel("Page " + (currentPage + 1) + "/" + totalPages);
+            interaction.update({
+                embeds: [embed],
+                components: [buttons]
+            });
+        }
+    });
+
+    collector.on("end", (collected) => { interaction.editReply({ components: [] });});
 }
 
 function printTime(time) {

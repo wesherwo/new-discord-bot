@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageEmbed } = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 const fs = require('fs');
 const path = 'saveData/reminders.json';
 
@@ -76,7 +76,7 @@ async function ping (interaction, newInteraction) {
         deletePing(interaction);
         return;
     }
-    let embed = new MessageEmbed();
+    let embed = new EmbedBuilder();
     embed.setColor(13632027).setAuthor({name: message.interaction.user.username, iconURL: message.interaction.user.displayAvatarURL()}).setTimestamp()
         .setDescription('Ping set for ' + pingTime);
     botcmds.send({embeds: [embed]});

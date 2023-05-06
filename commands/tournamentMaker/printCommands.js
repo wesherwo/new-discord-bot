@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageEmbed } = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 const tournament = require('./_tournamentMain.js');
 
 module.exports = {
@@ -89,7 +89,7 @@ function makeTeamEmbed(t, interaction) {
 			s += ', ';
 		}
 	}
-	let embed = new MessageEmbed();
+	let embed = new EmbedBuilder();
 	embed.setColor(13632027)
 		.setDescription(s)
 		.setThumbnail(teamImg[t])

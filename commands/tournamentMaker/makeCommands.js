@@ -1,4 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
+const { ChannelType } = require('discord.js');
 const tournament = require('./_tournamentMain.js');
 
 var players = [];
@@ -240,7 +241,7 @@ function makeChannels(interaction) {
 	let teamNames = tournament.getTeamNames();
 	for (let i = 0; i < teams.length; i++) {
 		if (interaction.guild.channels.cache.find(val => val.name === teamNames[i]) === undefined) {
-			interaction.guild.channels.create(teamNames[i], { type: "GUILD_VOICE" });
+			interaction.guild.channels.create({ name: teamNames[i], type: ChannelType.GuildVoice });
 		}
 	}
 	interaction.reply({ content: 'Channels created', ephemeral: true });

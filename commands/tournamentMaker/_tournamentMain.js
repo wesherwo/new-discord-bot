@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageEmbed } = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 const fs = require('fs');
 var icons = JSON.parse(fs.readFileSync('resources/images/defaultImages.json')).images;
 
@@ -22,7 +22,7 @@ module.exports = {
 		.setName('t-help')
 		.setDescription('Shows commands for tournaments and how to use them to run a tournament'),
 	async execute(client, interaction) {
-		let embed = new MessageEmbed();
+		let embed = new EmbedBuilder();
     	embed.setColor(3447003).setTitle('List of commands').addFields(
 			[{name:'t-clear',value:'Resets the tournament and removes the created channels'},
 			{name:'t-info',value:'Information for the tournament'},

@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageEmbed } = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 const fs = require('node:fs');
 const holidaysPath = 'saveData/holidays.json';
 const holidayNamesPath = 'saveData/holidayNames.json';
@@ -13,7 +13,7 @@ module.exports = {
 		.setName('holiday-name-help')
 		.setDescription('Displays holiday name changer commands and how to use them'),
 	async execute(client, interaction) {
-		let embed = new MessageEmbed();
+		let embed = new EmbedBuilder();
         embed.setColor(3447003).setTitle('List of commands').addFields(
             [{ name: 'holiday-range add', value: 'Add a holiday' },
             { name: 'holiday-range edit', value: 'Edit a holidays date range' },
