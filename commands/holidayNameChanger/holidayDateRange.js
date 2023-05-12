@@ -155,6 +155,9 @@ function removeHoliday(interaction) {
 function verifyNoDateRangeOverlaps(startDate, endDate, name) {
     var conflict = null;
     var holidays = getHolidays();
+    if(startDate.getTime() - endDate.getTime() > 0) {
+        endDate.setFullYear(endDate.getFullYear() + 1);
+    }
     Object.keys(holidays).forEach(holiday => {
         if(!name || holiday.toLowerCase().trim().localeCompare(name.toLowerCase().trim()) != 0) {
             var compareStartDate = new Date();
@@ -164,6 +167,10 @@ function verifyNoDateRangeOverlaps(startDate, endDate, name) {
             var compareEndDate = new Date();
             compareEndDate.setMonth(holidays[holiday]['end-month'] - 1);
             compareEndDate.setDate(holidays[holiday]['end-day']);
+
+            if(compareStartDate.getTime() - compareEndDate.getTime() > 0) {
+                compareEndDate.setFullYear(compareEndDate.getFullYear() + 1);
+            }
 
             if(((startDate.getTime() - compareStartDate.getTime() >= 0) && (startDate.getTime() - compareEndDate.getTime() <= 0)) 
                     || ((endDate.getTime() - compareStartDate.getTime() >= 0) && (endDate.getTime() - compareEndDate.getTime() <= 0))) {
