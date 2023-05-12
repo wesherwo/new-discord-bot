@@ -70,11 +70,6 @@ function makeHoliday(interaction) {
     endDate.setMonth(endMonth - 1);
     endDate.setDate(endDay);
 
-    if (startDate.getTime() > endDate.getTime()) {
-        interaction.reply({ content: 'Start date must be before end date', ephemeral: true });
-        return;
-    }
-
     var overlap = verifyNoDateRangeOverlaps(startDate, endDate, null);
     if(overlap != null) {
         interaction.reply({ content: 'Date range overlaps with ' + overlap, ephemeral: true });
@@ -113,12 +108,7 @@ function editHoliday(interaction) {
     var endDate = new Date();
     endDate.setMonth(endMonth - 1);
     endDate.setDate(endDay);
-
-    if (startDate.getTime() > endDate.getTime()) {
-        interaction.reply({ content: 'Start date must be before end date', ephemeral: true });
-        return;
-    }
-
+    
     var overlap = verifyNoDateRangeOverlaps(startDate, endDate, interaction.options.getString('holiday'));
     if(overlap != null) {
         interaction.reply({ content: 'Date range overlaps with ' + overlap, ephemeral: true });
