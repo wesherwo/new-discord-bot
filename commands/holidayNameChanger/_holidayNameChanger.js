@@ -64,6 +64,13 @@ function isHoliday() {
         var compareEndDate = new Date();
         compareEndDate.setMonth(holidays[holiday]['end-month'] - 1);
         compareEndDate.setDate(holidays[holiday]['end-day']);
+        if(compareStartDate.getTime() - compareEndDate.getTime() > 0) {
+            if(date.getTime() - compareStartDate.getTime() >= 0) {
+                compareEndDate.setFullYear(compareEndDate.getFullYear() + 1);
+            } else {
+                compareStartDate.setFullYear(compareStartDate.getFullYear() - 1);
+            }
+        }
         if((date.getTime() - compareStartDate.getTime() >= 0) && (date.getTime() - compareEndDate.getTime() <= 0)) {
             withinHoliday = holiday;
         }
