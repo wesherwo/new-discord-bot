@@ -9,8 +9,7 @@ module.exports = {
         let embed = new EmbedBuilder();
         embed.setColor(13632027).setAuthor({name: oldMessage.author.username, iconURL: oldMessage.author.displayAvatarURL()}).setTimestamp()
             .setDescription(`Message edited in <#${oldMessage.channel.id}> [Jump to Message](${oldMessage.url})`)
-            .addField('Before', oldMessage.content)
-            .addField('After', newMessage.content);
+            .addFields([{name: 'Before', value: oldMessage.content},{name: 'After', value: newMessage.content}]);
         client.channels.cache.find(val => val.name === 'bot-cmds').send({embeds: [embed]});
 	},
 };
