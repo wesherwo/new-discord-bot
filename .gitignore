@@ -60,3 +60,6 @@ typings/
 # next.js build output
 .next
 config.json
+
+# ignore these files
+resources/mtg/cards.xml

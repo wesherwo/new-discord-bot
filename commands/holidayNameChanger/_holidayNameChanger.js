@@ -49,7 +49,7 @@ function runEachHour() {
         currentHoliday = withinHoliday;
         updateNames();
     }
-    setTimeout(runEachHour, 360000);
+    setTimeout(runEachHour, 3600000);
 }
 
 function isHoliday() {
@@ -58,10 +58,14 @@ function isHoliday() {
     var holidays = JSON.parse(fs.readFileSync(holidaysPath));
     Object.keys(holidays).forEach(holiday => {
         var compareStartDate = new Date();
+        compareStartDate.setHours(0);
+        compareStartDate.setMinutes(1);
         compareStartDate.setMonth(holidays[holiday]['start-month'] - 1);
         compareStartDate.setDate(holidays[holiday]['start-day']);
 
         var compareEndDate = new Date();
+        compareEndDate.setHours(23);
+        compareEndDate.setMinutes(59);
         compareEndDate.setMonth(holidays[holiday]['end-month'] - 1);
         compareEndDate.setDate(holidays[holiday]['end-day']);
         if(compareStartDate.getTime() - compareEndDate.getTime() > 0) {
