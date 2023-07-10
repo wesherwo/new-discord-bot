@@ -125,7 +125,7 @@ function updateCards() {
         var cards = {};
         var cardData = results['cockatrice_carddatabase']['cards'][0]['card'];
         cardData.forEach(card => {
-            if(!card['prop'][0]['type'][0].includes('Basic Snow Land') && !card['prop'][0]['type'][0].includes('Basic Land')) {
+            if(!card['prop'][0]['type'][0].includes('Basic Snow Land') && !card['prop'][0]['type'][0].includes('Basic Land') && !card['prop'][0]['side'][0].includes('back')) {
                 card['set'].forEach(set => {
                     if(!cards[set['_']]) {
                         cards[set['_']] = {};
@@ -173,10 +173,10 @@ function generatePack(setNames, modifier) {
     var pack = [];
     //normal draft 10C 3U 1R
     if(!modifier) {
-        for(var i = 0; i < 10; i++) {
+        for(var i = 0; i < 1; i++) {
             pack.push(commons[Math.floor(Math.random() * commons.length)]);
         }
-        for(var i = 0; i < 3; i++) {
+        for(var i = 0; i < 1; i++) {
             pack.push(uncommons[Math.floor(Math.random() * uncommons.length)]);
         }
         rares = rares.concat(mythics);

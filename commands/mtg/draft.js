@@ -14,6 +14,7 @@ var deckLists = {};
 var currentPages = [];
 var madeSelection = [];
 var packCounter = 0;
+var matches = [];
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -34,6 +35,9 @@ module.exports = {
             subcommand.setName('start')
                 .setDescription('Starts the current draft'))
         .addSubcommand(subcommand =>
+            subcommand.setName('make-matches')
+                .setDescription('Makes a bracket for the current draft'))
+        .addSubcommand(subcommand =>
             subcommand.setName('delete')
                 .setDescription('Stops the current draft'))
         .addSubcommand(subcommand =>
@@ -53,7 +57,9 @@ module.exports = {
 			deleteDraft(interaction);
 		} else if (interaction.options.getSubcommand() == 'one-pack') {
 			onePack(interaction);
-		}
+		} else if (interaction.options.getSubcommand() == 'make-matches') {
+            makeMatches();
+        }
 	},
 };
 
@@ -201,10 +207,8 @@ function checkAllSelected() {
         }
         if(packs[0].length == 0) {
             packCounter++;
-            if(packCounter == 3) {
+            if(packCounter == 1) {
                 makeDecklists();
-                makeMatches();
-                resetDraft();
                 return;
             }
             packs = getPacks(Object.keys(players).length, draftSets, draftModifier);
@@ -298,42 +302,42 @@ function makeMatches() {
 		toSend.push(s);
 	}
 	toSend.push('```');
-	interaction.reply(toSend.join('\n'));
+	currentDraftMessage.channel.send(toSend.join('\n'));
 }
 
 function getPlayerNames() {
     return Object.keys(players);
 }
 
-function singleElimination(playerNmaes, games) {
-	if (playerNmaes.length == 2) {
-		tournament.addMatch([playerNmaes[0], playerNmaes[1]]);
+function singleElimination(playerNames, games) {
+	if (playerNames.length == 2) {
+		matches.push([playerNames[0], playerNames[1]]);
 	} else {
-		for (var i = 0; i < playerNmaes.length; i += 2) {
-			tournament.addMatch([playerNmaes[i], playerNmaes[i + 1]]);
+		for (var i = 0; i < playerNames.length; i += 2) {
+			matches.push([playerNames[i], playerNames[i + 1]]);
 		}
-		var newplayerNmaes = [];
-		if (playerNmaes.length % 2 == 1) {
-			newplayerNmaes.push(playerNmaes[playerNmaes.length - 1]);
+		var newplayerNames = [];
+		if (playerNames.length % 2 == 1) {
+			newplayerNames.push(playerNames[playerNames.length - 1]);
 		}
 		for (var i = games; i < tournament.getMatches().length; i++) {
-			newplayerNmaes.push('Winner of Game' + (games + i + 1));
+			newplayerNames.push('Winner of Game' + (games + i + 1));
 		}
-		singleElimination(newplayerNmaes, tournament.getMatches().length);
+		singleElimination(newplayerNames, tournament.getMatches().length);
 	}
 }
 
 function doubleElimination(winners, losers, upperGames, lowerGames) {
 	if (winners.length == 1) {
-		tournament.addMatch([winners[0], losers[0]]);
+		matches.push([winners[0], losers[0]]);
 	} else {
 		newLowerGames = lowerGames;
 		for (var i = 0; i < losers.length; i += 2) {
-			tournament.addMatch([losers[i], losers[i + 1]]);
+			matches.push([losers[i], losers[i + 1]]);
 			newLowerGames++;
 		}
 		var newLosers = [];
-		if (playerNmaes.length % 2 == 1) {
+		if (playerNames.length % 2 == 1) {
 			newLosers.push(losers[losers.length - 1]);
 		}
 		for (var i = lowerGames; i < newLowerGames; i++) {
@@ -342,11 +346,11 @@ function doubleElimination(winners, losers, upperGames, lowerGames) {
 
 		newUpperGames = upperGames;
 		for (var i = 0; i < winners.length; i += 2) {
-			tournament.addMatch([winners[i], winners[i + 1]]);
+			matches.push([winners[i], winners[i + 1]]);
 			newUpperGames++;
 		}
 		var newWinners = [];
-		if (playerNmaes.length % 2 == 1) {
+		if (playerNames.length % 2 == 1) {
 			newWinners.push(winners[winners.length - 1]);
 		}
 		for (var i = upperGames; i < newUpperGames; i++) {
@@ -357,18 +361,18 @@ function doubleElimination(winners, losers, upperGames, lowerGames) {
 	}
 }
 
-function roundRobin(playerNmaes, rounds) {
-	if (playerNmaes.length % 2 != 0) {
-		playerNmaes.push(null);
+function roundRobin(playerNames, rounds) {
+	if (playerNames.length % 2 != 0) {
+		playerNames.push(null);
 	}
-	var half = playerNmaes.length / 2;
+	var half = playerNames.length / 2;
 	for (var i = 0; i < half; i++) {
-		tournament.addMatch([playerNmaes[i], playerNmaes[i + half]]);
+		matches.push([playerNames[i], playerNames[i + half]]);
 	}
-	var temp1 = playerNmaes.shift();
-	var temp2 = playerNmaes.pop();
-	playerNmaes.unshift(temp1, temp2);
-	if (rounds < playerNmaes.length - 1) {
-		roundRobin(playerNmaes, rounds + 1);
+	var temp1 = playerNames.shift();
+	var temp2 = playerNames.pop();
+	playerNames.unshift(temp1, temp2);
+	if (rounds < playerNames.length - 1) {
+		roundRobin(playerNames, rounds + 1);
 	}
 }
