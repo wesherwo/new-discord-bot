@@ -173,10 +173,10 @@ function generatePack(setNames, modifier) {
     var pack = [];
     //normal draft 10C 3U 1R
     if(!modifier) {
-        for(var i = 0; i < 1; i++) {
+        for(var i = 0; i < 10; i++) {
             pack.push(commons[Math.floor(Math.random() * commons.length)]);
         }
-        for(var i = 0; i < 1; i++) {
+        for(var i = 0; i < 3; i++) {
             pack.push(uncommons[Math.floor(Math.random() * uncommons.length)]);
         }
         rares = rares.concat(mythics);

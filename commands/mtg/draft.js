@@ -207,7 +207,7 @@ function checkAllSelected() {
         }
         if(packs[0].length == 0) {
             packCounter++;
-            if(packCounter == 1) {
+            if(packCounter == 3) {
                 makeDecklists();
                 return;
             }
@@ -320,10 +320,10 @@ function singleElimination(playerNames, games) {
 		if (playerNames.length % 2 == 1) {
 			newplayerNames.push(playerNames[playerNames.length - 1]);
 		}
-		for (var i = games; i < tournament.getMatches().length; i++) {
+		for (var i = games; i < matches.length; i++) {
 			newplayerNames.push('Winner of Game' + (games + i + 1));
 		}
-		singleElimination(newplayerNames, tournament.getMatches().length);
+		singleElimination(newplayerNames, matches.length);
 	}
 }
 
