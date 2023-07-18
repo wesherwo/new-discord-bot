@@ -21,8 +21,8 @@ module.exports = {
 };
 
 module.exports.startup = (client) => {
-    updateSets();
-    updateCards();
+    //updateSets();
+    //updateCards();
 }
 
 module.exports.getSets = () => {

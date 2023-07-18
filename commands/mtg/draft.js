@@ -19,7 +19,7 @@ var matches = [];
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('mtg-draft')
-		.setDescription('Edit holiday names for a user')
+		.setDescription('Run a MTG draft')
         .addSubcommand(subcommand =>
 			subcommand.setName('create')
 				.setDescription('Creates a magic the gathering draft')
@@ -67,10 +67,19 @@ module.exports.startup = (client) => {
     bot = client;
 }
 
-
 async function createDraft(interaction) {
     if (!currentDraftMessage) {
         draftSets = interaction.options.getString('setlist').split(',');
+        var setListGood = true;
+        draftSets.forEach(set => {
+            if(!setExists(set)) {
+                setListGood = false;
+                interaction.reply({ content: set + ' is not a valid set', ephemeral: true });
+            }
+        });
+        if(!setListGood) {
+            return;
+        }
         type = interaction.options.getString('bracket');
         draftModifier = interaction.options.getString('modifier');
         interaction.reply(`React to this message to sign up for a magic the gathering draft`);
@@ -115,13 +124,13 @@ function sendPacks() {
     }
 }
 
-function sendToUser(userNum) {
+async function sendToUser(userNum) {
     var embeds = [];
     let embed = new EmbedBuilder();
     embed.setColor(3447003);
     for (var i = 0; i < packs[userNum].length; i++) {
         embed.setTitle(packs[userNum][i]['name']);
-        embed.setImage(`https://www.mtgpics.com/pics/big/${packs[userNum][i]['set'].toLowerCase()}/${packs[userNum][i]['num']}.jpg`);
+        embed.setImage(`https://mythicspoiler.com/${packs[userNum][i]['set'].toLowerCase()}/cards/${packs[userNum][i]['name'].toLowerCase().replaceAll(' ', '')}.jpg`);
         embeds.push(embed);
         embed = new EmbedBuilder();
         embed.setColor(3447003);
