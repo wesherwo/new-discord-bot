@@ -130,7 +130,9 @@ async function sendToUser(userNum) {
     embed.setColor(3447003);
     for (var i = 0; i < packs[userNum].length; i++) {
         embed.setTitle(packs[userNum][i]['name']);
-        var cardName = packs[userNum][i]['name'].toLowerCase().replaceAll(' ', '').replaceAll("'", '').replaceAll("-", '').replaceAll("/", '');
+        var cardName = packs[userNum][i]['name'].replaceAll('á', 'a').replaceAll('É', 'e').replaceAll('ó', 'o').replaceAll('ú', 'u').replaceAll('û','u')
+                            .toLowerCase().replaceAll(' ', '').replaceAll("'", '').replaceAll('-', '').replaceAll('/', '').replaceAll('!', '');
+                                                
         embed.setImage(`https://mythicspoiler.com/${packs[userNum][i]['set'].toLowerCase()}/cards/${cardName}.jpg`);
         embeds.push(embed);
         embed = new EmbedBuilder();
