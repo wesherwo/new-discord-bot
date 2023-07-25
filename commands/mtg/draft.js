@@ -130,7 +130,8 @@ async function sendToUser(userNum) {
     embed.setColor(3447003);
     for (var i = 0; i < packs[userNum].length; i++) {
         embed.setTitle(packs[userNum][i]['name']);
-        embed.setImage(`https://mythicspoiler.com/${packs[userNum][i]['set'].toLowerCase()}/cards/${packs[userNum][i]['name'].toLowerCase().replaceAll(' ', '')}.jpg`);
+        var cardName = packs[userNum][i]['name'].toLowerCase().replaceAll(' ', '').replaceAll("'", '').replaceAll("-", '').replaceAll("/", '');
+        embed.setImage(`https://mythicspoiler.com/${packs[userNum][i]['set'].toLowerCase()}/cards/${cardName}.jpg`);
         embeds.push(embed);
         embed = new EmbedBuilder();
         embed.setColor(3447003);
