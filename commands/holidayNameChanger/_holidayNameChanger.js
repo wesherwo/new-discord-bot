@@ -68,6 +68,14 @@ function isHoliday() {
         compareEndDate.setMinutes(59);
         compareEndDate.setMonth(holidays[holiday]['end-month'] - 1);
         compareEndDate.setDate(holidays[holiday]['end-day']);
+
+        if(date.getDate() == 31) {
+            console.log('line 73: holiday = ' + holiday);
+            console.log('line 74: compareStartDate = ' + compareStartDate);
+            console.log('line 75: compareEndDate = ' + compareEndDate);
+            console.log();
+        }
+
         if(compareStartDate.getTime() - compareEndDate.getTime() > 0) {
             if(date.getTime() - compareStartDate.getTime() >= 0) {
                 compareEndDate.setFullYear(compareEndDate.getFullYear() + 1);
@@ -79,9 +87,24 @@ function isHoliday() {
             withinHoliday = holiday;
         }
     });
+
+    if(date.getDate() == 31) {
+        console.log('line 92: withinHoliday = ' + withinHoliday);
+    }
+
     return withinHoliday;
 }
+
 function updateNames() {
+
+    var date = new Date();
+    if(date.getDate() == 31) {
+        console.log('line 102: currentHoliday = ' + currentHoliday);
+        console.log();
+        console.log('====================================================');
+        console.log();
+    }
+
     updateHolidayNames();
     updateHolidayRoles();
     updateHolidayChannels();

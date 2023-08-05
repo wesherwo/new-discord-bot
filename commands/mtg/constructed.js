@@ -94,7 +94,7 @@ function startConstructed(interaction) {
     packs = getPacks(Object.keys(players).length * 3, constructedSets, constructedModifier);
     interaction.reply({ content: 'The constructed event has begun!', ephemeral: true });
     for(var i in players) {
-        playerList.push(players[i]);
+        playerList.push(players[i].username);
     }
     for(var i = 0; i < playerList.length; i++) {
         sendDecklists(i);
@@ -102,10 +102,10 @@ function startConstructed(interaction) {
     resetConstructed();
 }
 
-function sendDecklists(user) {
+function sendDecklists(player) {
     var deck = {};
     for(var i = 0; i < 3; i++) {
-        var pack = packs[user + (user * i)];
+        var pack = packs[player + (playerList.length * i)];
         pack.forEach(card => {
             if(!deck[card['name']]) {
                 deck[card['name']] = 0;
@@ -117,19 +117,20 @@ function sendDecklists(user) {
     for(card in deck) {
         deckString += deck[card] + ' ' + card + "\n";
     }
-    players[playerList[user]].send("Copy this into cockatice for your deck. \n\n" + deckString);
+	var user = bot.guilds.cache.at(0).members.cache.find(user => user.id == players[playerList[player]].id);
+    user.send("Copy this into cockatice for your deck. \n\n" + deckString);
 }
 
 function resetConstructed() {
-    currentDraftMessage.delete();
-    currentDraftMessage = null;
+    currentConstructedMessage.delete();
+    currentConstructedMessage = null;
     players = {};
     deckLists = {};
     currentPages = [];
     madeSelection = [];
     packCounter = 0;
-    draftSets = null;
-    draftModifier = null;
+    constructedSets = null;
+    constructedModifier = null;
     type = null;
 }
 
