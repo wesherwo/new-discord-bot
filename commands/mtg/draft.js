@@ -134,6 +134,9 @@ async function sendToUser(userNum) {
                             .toLowerCase().replaceAll(' ', '').replaceAll("'", '').replaceAll('-', '').replaceAll('/', '').replaceAll('!', '').replaceAll(',', '');
                                                 
         embed.setImage(`https://mythicspoiler.com/${packs[userNum][i]['set'].toLowerCase()}/cards/${cardName}.jpg`);
+        if(pack[i]['set'].toLowerCase().localeCompare('afr') == 0) {
+            embed.setImage(`https://mythicspoiler.com/dnd/cards/${cardName}.jpg`);
+        }
         embeds.push(embed);
         embed = new EmbedBuilder();
         embed.setColor(3447003);
