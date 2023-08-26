@@ -68,7 +68,7 @@ async function createConstructed(interaction) {
         }
         type = interaction.options.getString('bracket');
         constructedModifier = interaction.options.getString('modifier');
-        interaction.reply(`React to this message to sign up for a magic the gathering draft`);
+        interaction.reply(`React to this message to sign up for a magic the gathering constructed`);
         message = await interaction.fetchReply();
         currentConstructedMessage = message;
     } else {
@@ -161,7 +161,7 @@ function makeMatches() {
 		toSend.push(s);
 	}
 	toSend.push('```');
-	currentDraftMessage.channel.send(toSend.join('\n'));
+	currentConstructedMessage.channel.send(toSend.join('\n'));
 }
 
 function getPlayerNames() {
