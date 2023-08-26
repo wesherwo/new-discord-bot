@@ -10,7 +10,7 @@ module.exports = {
 		.setName('my-reminders')
 		.setDescription('Displays any reminders you are subscribed to'),
 	async execute(client, interaction) {
-        await interaction.deferReply();
+        await interaction.deferReply({ ephemeral: true });
 		myReminders(client, interaction);
 	},
 };
@@ -28,7 +28,6 @@ function myReminders (client, interaction) {
                         var time = message.content.substring(38, message.content.indexOf('for:')).trim();
                         var msg = message.content.substring(message.content.indexOf('\n')+1).trim();
                         pingSubscriptions += time + '\n' + msg + '\n\n';
-                        console.log(pingSubscriptions);
                     }
                 }));
             });
