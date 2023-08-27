@@ -27,7 +27,7 @@ function myReminders (client, interaction) {
                         reacted = true;
                         var time = message.content.substring(38, message.content.indexOf('for:')).trim();
                         var msg = message.content.substring(message.content.indexOf('\n')+1).trim();
-                        pingSubscriptions += time + '\n' + msg + '\n\n';
+                        pingSubscriptions += time + ' - ' + message.url + '\n' + msg + '\n\n';
                     }
                 }));
             });
