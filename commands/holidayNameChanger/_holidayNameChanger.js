@@ -60,21 +60,14 @@ function isHoliday() {
         var compareStartDate = new Date();
         compareStartDate.setHours(0);
         compareStartDate.setMinutes(1);
-        compareStartDate.setMonth(holidays[holiday]['start-month'] - 1);
         compareStartDate.setDate(holidays[holiday]['start-day']);
+        compareStartDate.setMonth(holidays[holiday]['start-month'] - 1);
 
         var compareEndDate = new Date();
         compareEndDate.setHours(23);
         compareEndDate.setMinutes(59);
-        compareEndDate.setMonth(holidays[holiday]['end-month'] - 1);
         compareEndDate.setDate(holidays[holiday]['end-day']);
-
-        if(date.getDate() == 31) {
-            console.log('line 73: holiday = ' + holiday);
-            console.log('line 74: compareStartDate = ' + compareStartDate);
-            console.log('line 75: compareEndDate = ' + compareEndDate);
-            console.log();
-        }
+        compareEndDate.setMonth(holidays[holiday]['end-month'] - 1);
 
         if(compareStartDate.getTime() - compareEndDate.getTime() > 0) {
             if(date.getTime() - compareStartDate.getTime() >= 0) {
