@@ -80,24 +80,11 @@ function isHoliday() {
             withinHoliday = holiday;
         }
     });
-
-    if(date.getDate() == 31) {
-        console.log('line 92: withinHoliday = ' + withinHoliday);
-    }
-
     return withinHoliday;
 }
 
 function updateNames() {
-
     var date = new Date();
-    if(date.getDate() == 31) {
-        console.log('line 102: currentHoliday = ' + currentHoliday);
-        console.log();
-        console.log('====================================================');
-        console.log();
-    }
-
     updateHolidayNames();
     updateHolidayRoles();
     updateHolidayChannels();
