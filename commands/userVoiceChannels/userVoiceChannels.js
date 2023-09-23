@@ -60,12 +60,11 @@ function makeChannelByCommand(client, interaction) {
 }
 
 function makeChannel(client, member, name) {
-    client.guilds.cache.at(0).channels.create({ name: name, type: ChannelType.GuildVoice }).then(chan => { moveUser(member, chan); });
+    client.guilds.cache.at(0).channels.create({ name: name, type: ChannelType.GuildVoice, parent: userChannelCategory.parent }).then(chan => { moveUser(member, chan); });
 }
 
 function moveUser(member, chan) {
     channels[chan.id] = { 'owner': member };
-    chan.setParent(userChannelCategory.parent, {lockPermissions:false});
     if (member.voice.channel != null) {
         member.voice.setChannel(chan);
     }
