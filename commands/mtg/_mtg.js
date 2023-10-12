@@ -47,7 +47,7 @@ module.exports.packMessage = (interaction, pack) => {
     embed.setColor(3447003);
     for (var i = 0; i < pack.length; i++) {
         embed.setTitle(pack[i]['name']);
-        embed.setImage(`https://www.mtgpics.com/pics/big/${pack[i]['set'].toLowerCase()}/${pack[i]['num']}.jpg`);
+        embed.setImage(`https://mythicspoiler.com/${packs[userNum][i]['set'].toLowerCase()}/cards/${cardName}.jpg`);
         embeds.push(embed);
         embed = new EmbedBuilder();
         embed.setColor(3447003);
