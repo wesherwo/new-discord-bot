@@ -195,6 +195,10 @@ module.exports.setDefaultName = (names, id, name, interaction, color) =>{
     else { idNames['default'] = {'name':name, 'color':color}; }
     names[id] = idNames;
     interaction.reply({ content: 'Default name has been added/updated', ephemeral: true });
+    if(currentHoliday.localeCompare('default') == 0) {
+        var user = bot.guilds.cache.at(0).members.cache.find(user => user.id == id);
+        user.setNickname(holidayNames[id][currentHoliday], 'Updated username back to default');
+    }
     return names;
 }
 
@@ -217,6 +221,10 @@ module.exports.addName = (names, id, holiday, name, interaction, color) => {
     else { idNames[holiday] = {'name':name, 'color':color}; }
     names[id] = idNames;
     interaction.reply({ content: 'Holiday name has been added', ephemeral: true });
+    if(holiday.localeCompare(currentHoliday) == 0) {
+        var user = bot.guilds.cache.at(0).members.cache.find(user => user.id == id);
+        user.setNickname(holidayNames[id][currentHoliday], 'Updated username for ' + currentHoliday);
+    }
     return names;
 }
 
@@ -238,6 +246,10 @@ module.exports.changeName = (names, id, holiday, name, interaction, color) => {
     else { idNames[holiday] = {'name':name, 'color':color}; }
     names[id] = idNames;
     interaction.reply({ content: 'Holiday name has been changed', ephemeral: true });
+    if(holiday.localeCompare(currentHoliday) == 0) {
+        var user = bot.guilds.cache.at(0).members.cache.find(user => user.id == id);
+        user.setNickname(holidayNames[id][currentHoliday], 'Updated username for ' + currentHoliday);
+    }
     return names;
 }
 
