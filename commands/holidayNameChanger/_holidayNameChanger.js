@@ -195,10 +195,6 @@ module.exports.setDefaultName = (names, id, name, interaction, color) =>{
     else { idNames['default'] = {'name':name, 'color':color}; }
     names[id] = idNames;
     interaction.reply({ content: 'Default name has been added/updated', ephemeral: true });
-    if(currentHoliday.localeCompare('default') == 0) {
-        var user = bot.guilds.cache.at(0).members.cache.find(user => user.id == id);
-        user.setNickname(holidayNames[id][currentHoliday], 'Updated username back to default');
-    }
     return names;
 }
 
@@ -221,10 +217,6 @@ module.exports.addName = (names, id, holiday, name, interaction, color) => {
     else { idNames[holiday] = {'name':name, 'color':color}; }
     names[id] = idNames;
     interaction.reply({ content: 'Holiday name has been added', ephemeral: true });
-    if(holiday.localeCompare(currentHoliday) == 0) {
-        var user = bot.guilds.cache.at(0).members.cache.find(user => user.id == id);
-        user.setNickname(holidayNames[id][currentHoliday], 'Updated username for ' + currentHoliday);
-    }
     return names;
 }
 
@@ -246,10 +238,6 @@ module.exports.changeName = (names, id, holiday, name, interaction, color) => {
     else { idNames[holiday] = {'name':name, 'color':color}; }
     names[id] = idNames;
     interaction.reply({ content: 'Holiday name has been changed', ephemeral: true });
-    if(holiday.localeCompare(currentHoliday) == 0) {
-        var user = bot.guilds.cache.at(0).members.cache.find(user => user.id == id);
-        user.setNickname(holidayNames[id][currentHoliday], 'Updated username for ' + currentHoliday);
-    }
     return names;
 }
 
@@ -297,4 +285,21 @@ module.exports.printNames = (names) => {
         output += 'Default' + ' - ' + 'No name set';
     }
     return output;
+}
+
+module.exports.updateForNameChange = (holiday, id) => {
+    console.log(holiday);
+    console.log(currentHoliday);
+    if(holiday.localeCompare(currentHoliday) == 0) {
+        console.log('here');
+        var user = bot.guilds.cache.at(0).members.cache.find(user => user.id == id);
+        if(JSON.parse(fs.readFileSync(holidayNamesPath))[id][currentHoliday]) {
+            console.log('here');
+            user.setNickname(JSON.parse(fs.readFileSync(holidayNamesPath))[id][currentHoliday], 'Updated username for ' + currentHoliday);
+        } else if(JSON.parse(fs.readFileSync(holidayNamesPath))[id]["default"]) {
+            user.setNickname(JSON.parse(fs.readFileSync(holidayNamesPath))[id]["default"], 'Updated username for ' + currentHoliday);
+        } else {
+            user.setNickname(null, 'Removed holiday name for ' + currentHoliday);
+        }
+    }
 }

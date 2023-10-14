@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { getHolidayNames, setHolidayNames, setDefaultName, addName, changeName, removeName, printNames } = require('./_holidayNameChanger');
+const { getHolidayNames, setHolidayNames, setDefaultName, addName, changeName, removeName, printNames, updateForNameChange } = require('./_holidayNameChanger');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -45,21 +45,25 @@ module.exports = {
 function defaultName(interaction) {
     var names = setDefaultName(getHolidayNames(), interaction.user.id, interaction.options.getString('name'), interaction);
     setHolidayNames(names);
+    updateForNameChange("default", interaction.user.id);
 }
 
 function addHolidayName(interaction) {
     var names = addName(getHolidayNames(), interaction.user.id, interaction.options.getString('holiday').toLowerCase().trim(), interaction.options.getString('name'), interaction);
     setHolidayNames(names);
+    updateForNameChange(interaction.options.getString('holiday').toLowerCase().trim(), interaction.user.id);
 }
 
 function changeHolidayName(interaction) {
     var names = changeName(getHolidayNames(), interaction.user.id, interaction.options.getString('holiday').toLowerCase().trim(), interaction.options.getString('name'), interaction);
     setHolidayNames(names);
+    updateForNameChange(interaction.options.getString('holiday').toLowerCase().trim(), interaction.user.id);
 }
 
 function removeHolidayName(interaction) {
     var names = removeName(getHolidayNames(), interaction.user.id, interaction.options.getString('holiday').toLowerCase().trim(), interaction);
     setHolidayNames(names);
+    updateForNameChange(interaction.user.id, interaction.options.getString('holiday').toLowerCase().trim(), interaction.user.id);
 }
 
 function printHolidayNames(interaction) {
