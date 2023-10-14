@@ -155,7 +155,7 @@ module.exports.startGamemode = (interaction, cards, cardType) => {
     collector.on("collect", (interaction) => {
         if (interaction.customId === "next") {
             currentPage++;
-            if(currentPage > embeds.length) {
+            if(currentPage >= embeds.length) {
                 currentPage = 0;
             }
             interaction.update({
