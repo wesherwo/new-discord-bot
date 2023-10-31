@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { getHolidayNames, setHolidayNames, setDefaultName, addName, changeName, removeName, printNames, updateForNameChange } = require('./_holidayNameChanger');
+const { getHolidayNames, setHolidayNames, setDefaultName, addName, removeName, printNames, updateForNameChange } = require('./_holidayNameChanger');
 
 module.exports = {
 	data: new SlashCommandBuilder()
