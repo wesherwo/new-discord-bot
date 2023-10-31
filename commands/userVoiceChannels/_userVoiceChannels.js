@@ -1,5 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { ChannelType } = require('discord.js');
+const fs = require('node:fs');
+const userChannelPath = 'saveData/userVoiceChannels.json';
 
 var userChannelCategory;
 var channels = {};
@@ -15,21 +17,23 @@ module.exports = {
 };
 
 module.exports.startup = (client) => {
-    userChannelCategory = client.channels.cache.find(val => val.name === 'Join to create channel');
-    if (userChannelCategory == null) {
+    var userChannelJoin = client.channels.cache.find(val => val.id === getUserChannel());
+    if (!userChannelJoin) {
         var guild = client.guilds.cache.at(0);
         guild.channels.create({ name: 'USER CHANNELS', type: ChannelType.GuildCategory }).then(parent => {
-            guild.channels.create({ name: 'Join to create channel',  type: ChannelType.GuildVoice }).then(chan => {
-                chan.setParent(parent);
+            guild.channels.create({ name: 'Join to create channel',  type: ChannelType.GuildVoice, parent: parent }).then(chan => {
+                var config = JSON.parse(fs.readFileSync(userChannelPath));
+                config['userChannelId'] = chan.id;
+                var jsonData = JSON.stringify(config);
+                fs.writeFileSync(userChannelPath, jsonData, function (err) { if (err) { console.log(err); } });
+                setCategoreyListener(chan.id, client);
             });
         });
         userChannelCategory = client.channels.cache.find(val => val.name === 'Join to create channel');
+    } else {
+        setCategoreyListener(userChannelJoin, client);
     }
-    client.on('voiceStateUpdate', (oldMember, newMember) => {
-        if (newMember.member.voice.channel != null && newMember.member.voice.channel.id == userChannelCategory.id) {
-            makeChannelByJoin(client, newMember.member);
-        }
-    });
+    
 }
 
 module.exports.getOwnedChannel = (member) => {
@@ -41,6 +45,19 @@ module.exports.getOwnedChannel = (member) => {
         }
     });
     return foundChan;
+}
+
+function getUserChannel() {
+    return JSON.parse(fs.readFileSync(userChannelPath))['userChannelId'];
+}
+
+function setCategoreyListener(userChannelJoin, client) {
+    userChannelCategory = userChannelJoin.parent;
+    client.on('voiceStateUpdate', (oldMember, newMember) => {
+        if (newMember.member.voice.channel != null && newMember.member.voice.channel.id == getUserChannel()) {
+            makeChannelByJoin(client, newMember.member);
+        }
+    });
 }
 
 function makeChannelByJoin(client, member) {
@@ -60,7 +77,7 @@ function makeChannelByCommand(client, interaction) {
 }
 
 function makeChannel(client, member, name) {
-    client.guilds.cache.at(0).channels.create({ name: name, type: ChannelType.GuildVoice, parent: userChannelCategory.parent }).then(chan => { moveUser(member, chan); });
+    client.guilds.cache.at(0).channels.create({ name: name, type: ChannelType.GuildVoice, parent: userChannelCategory }).then(chan => { moveUser(member, chan); });
 }
 
 function moveUser(member, chan) {

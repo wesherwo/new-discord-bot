@@ -15,11 +15,6 @@ module.exports = {
                 .addStringOption(option => option.setName('holiday').setDescription('Holiday for the name change').setRequired(true))
                 .addStringOption(option => option.setName('name').setDescription('Users nickname for the holiday').setRequired(true)))
         .addSubcommand(subcommand =>
-            subcommand.setName('replace')
-                .setDescription('Replaces a nickname for a holiday')
-                .addStringOption(option => option.setName('holiday').setDescription('Holiday for the name change').setRequired(true))
-                .addStringOption(option => option.setName('name').setDescription('Users new nickname for the holiday').setRequired(true)))
-        .addSubcommand(subcommand =>
             subcommand.setName('remove')
                 .setDescription('Removes a nickname for a holiday')
                 .addStringOption(option => option.setName('holiday').setDescription('Holiday for the name change').setRequired(true)))
@@ -32,8 +27,6 @@ module.exports = {
 			defaultName(interaction);
         } else if (interaction.options.getSubcommand() == 'add') {
 			addHolidayName(interaction);
-		} else if (interaction.options.getSubcommand() == 'replace') {
-			changeHolidayName(interaction);
 		} else if (interaction.options.getSubcommand() == 'remove') {
 			removeHolidayName(interaction);
 		} else if (interaction.options.getSubcommand() == 'print') {
@@ -54,16 +47,10 @@ function addHolidayName(interaction) {
     updateForNameChange(interaction.options.getString('holiday').toLowerCase().trim(), interaction.user.id);
 }
 
-function changeHolidayName(interaction) {
-    var names = changeName(getHolidayNames(), interaction.user.id, interaction.options.getString('holiday').toLowerCase().trim(), interaction.options.getString('name'), interaction);
-    setHolidayNames(names);
-    updateForNameChange(interaction.options.getString('holiday').toLowerCase().trim(), interaction.user.id);
-}
-
 function removeHolidayName(interaction) {
     var names = removeName(getHolidayNames(), interaction.user.id, interaction.options.getString('holiday').toLowerCase().trim(), interaction);
     setHolidayNames(names);
-    updateForNameChange(interaction.user.id, interaction.options.getString('holiday').toLowerCase().trim(), interaction.user.id);
+    updateForNameChange('default', interaction.user.id);
 }
 
 function printHolidayNames(interaction) {

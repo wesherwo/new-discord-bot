@@ -5,6 +5,7 @@ const holidaysPath = 'saveData/holidays.json';
 const holidayNamesPath = 'saveData/holidayNames.json';
 const holidayRolesPath = 'saveData/holidayRoles.json';
 const holidayChannelsPath = 'saveData/holidayChannels.json';
+const holidayIconsPath = 'saveData/holidayIcons.json';
 var bot;
 var currentHoliday;
 
@@ -19,21 +20,22 @@ module.exports = {
             { name: 'holiday-range edit', value: 'Edit a holidays date range' },
             { name: 'holiday-range remove', value: 'Remove a holiday' },
             { name: 'holiday-range print', value: 'Displays the holidays and their date ranges' },
-            { name: 'holiday-name default', value: 'Add a default nickname' },
-            { name: 'holiday-name add', value: 'Add a holiday nickname' },
-            { name: 'holiday-name replace', value: 'Replace a nickname for a holiday' },
+            { name: 'holiday-name default', value: 'Add/replace a default nickname' },
+            { name: 'holiday-name add', value: 'Add/replace a holiday nickname' },
             { name: 'holiday-name remove', value: 'Remove a nickname for a holiday' },
             { name: 'holiday-name print', value: 'Display your holiday nicknames' },
-            { name: 'holiday-role default', value: 'Add a default role name' },
-            { name: 'holiday-role add', value: 'Add a holiday role name' },
-            { name: 'holiday-role replace', value: 'Replace a role name for a holiday' },
+            { name: 'holiday-role default', value: 'Add/replace a default role name' },
+            { name: 'holiday-role add', value: 'Add/replace a holiday role name' },
             { name: 'holiday-role remove', value: 'Remove a role name for a holiday' },
             { name: 'holiday-role print', value: 'Display the holiday role names' },
-            { name: 'holiday-channel default', value: 'Add a default channel name' },
-            { name: 'holiday-channel add', value: 'Add a holiday channel name' },
-            { name: 'holiday-channel replace', value: 'Replace a channel name for a holiday' },
+            { name: 'holiday-channel default', value: 'Add/replace a default channel name' },
+            { name: 'holiday-channel add', value: 'Add/replace a holiday channel name' },
             { name: 'holiday-channel remove', value: 'Remove a channel name for a holiday' },
-            { name: 'holiday-channel print', value: 'Display the holiday channel names' }]);
+            { name: 'holiday-channel print', value: 'Display the holiday channel names' },
+            { name: 'holiday-icon default', value: 'Add a default server icon' },
+            { name: 'holiday-server-icon add', value: 'Add/replace a holiday server icon' },
+            { name: 'holiday-server-icon remove', value: 'Remove a server icon for a holiday' },
+            { name: 'holiday-server-icon print', value: 'Display the holiday server icons' }]);
         interaction.reply({ ephemeral: true, embeds: [embed] });
 	},
 };
@@ -84,22 +86,27 @@ function isHoliday() {
 }
 
 function updateNames() {
-    var date = new Date();
     updateHolidayNames();
     updateHolidayRoles();
     updateHolidayChannels();
+    updateHolidayIcon();
 }
 
 function updateHolidayNames() {
+    var holidays = JSON.parse(fs.readFileSync(holidaysPath));
     var holidayNames = JSON.parse(fs.readFileSync(holidayNamesPath));
     Object.keys(holidayNames).forEach(id => {
         var user = bot.guilds.cache.at(0).members.cache.find(user => user.id == id);
-        if(holidayNames[id][currentHoliday]) {
-            user.setNickname(holidayNames[id][currentHoliday], 'Updated username for ' + currentHoliday);
-        } else if(holidayNames[id]['default']) {
-            user.setNickname(holidayNames[id]['default'], 'Updated username back to default');
+        if(user.id == bot.guilds.cache.at(0).ownerId && user.nickname.localeCompare(holidayNames[id][currentHoliday]) != 0) {
+            user.send('Update your name for ' + holidays[currentHoliday]['name'] + ' to ' + holidayNames[id][currentHoliday]);
         } else {
-            user.setNickname(null, 'Removed nickname for ' + currentHoliday);
+            if(holidayNames[id][currentHoliday]) {
+                user.setNickname(holidayNames[id][currentHoliday], 'Updated username for ' + currentHoliday);
+            } else if(holidayNames[id]['default']) {
+                user.setNickname(holidayNames[id]['default'], 'Updated username back to default');
+            } else {
+                user.setNickname(null, 'Removed nickname for ' + currentHoliday);
+            }
         }
     });
 }
@@ -138,6 +145,19 @@ function updateHolidayChannels() {
     });
 }
 
+function updateHolidayIcon() {
+    var icons = JSON.parse(fs.readFileSync(holidayIconsPath));
+    var serverId = bot.guilds.cache.at(0).id;
+    if(!icons[serverId]) {
+        return;
+    }
+    else if(icons[serverId][currentHoliday]) {
+        bot.guilds.cache.at(0).setIcon(icons[serverId][currentHoliday], 'Updated icon for ' + currentHoliday);
+    } else if(icons[serverId]['default']) {
+        bot.guilds.cache.at(0).setIcon(icons[serverId]['default'], 'Updated icon back to default');
+    }
+}
+
 function holidayExists(holiday) {
     var exists = false;
     var holidays = JSON.parse(fs.readFileSync(holidaysPath));
@@ -166,7 +186,6 @@ module.exports.setHolidays = (holidays) => {
     var jsonData = JSON.stringify(holidays);
     fs.writeFileSync(holidaysPath, jsonData, function (err) { if (err) { console.log(err); } });
 }
-module.exports.getSortedHolidays = () => { return sortedHolidays();}
 
 module.exports.getHolidayNames = () => { return JSON.parse(fs.readFileSync(holidayNamesPath));}
 module.exports.setHolidayNames = (names) => { 
@@ -181,9 +200,15 @@ module.exports.setHolidayRoles = (roles) => {
 }
 
 module.exports.getHolidayChannels = () => { return JSON.parse(fs.readFileSync(holidayChannelsPath));}
-module.exports.setHolidayChannels = (Channels) => { 
-    var jsonData = JSON.stringify(Channels);
+module.exports.setHolidayChannels = (channels) => { 
+    var jsonData = JSON.stringify(channels);
     fs.writeFileSync(holidayChannelsPath, jsonData, function (err) { if (err) { console.log(err); } });
+}
+
+module.exports.getHolidayIcons = () => { return JSON.parse(fs.readFileSync(holidayIconsPath));}
+module.exports.setHolidayIcons = (icons) => { 
+    var jsonData = JSON.stringify(icons);
+    fs.writeFileSync(holidayIconsPath, jsonData, function (err) { if (err) { console.log(err); } });
 }
 
 module.exports.setDefaultName = (names, id, name, interaction, color) =>{
@@ -207,37 +232,10 @@ module.exports.addName = (names, id, holiday, name, interaction, color) => {
         interaction.reply({ content: 'That holiday has not been added yet', ephemeral: true });
         return;
     }
-    if(idNames) {
-        if(idNames[holiday]) {
-            interaction.reply({ content: 'There is already a name for this holiday.  Use the replace command to change', ephemeral: true });
-            return;
-        }
-    }
     if(color === undefined) { idNames[holiday] = name; }
     else { idNames[holiday] = {'name':name, 'color':color}; }
     names[id] = idNames;
     interaction.reply({ content: 'Holiday name has been added', ephemeral: true });
-    return names;
-}
-
-module.exports.changeName = (names, id, holiday, name, interaction, color) => {
-    var idNames = names[id];
-    if(!holidayExists(holiday)) {
-        interaction.reply({ content: 'That holiday does not exist', ephemeral: true });
-        return;
-    }
-    if(!idNames) {
-        interaction.reply({ content: "No names for any holiday", ephemeral: true });
-        return;
-    }
-    if(!idNames[interaction.options.getString('holiday').toLowerCase().trim()]) {
-        interaction.reply({ content: "No name for this holiday.  Use the add command instead", ephemeral: true });
-        return;
-    }
-    if(color === undefined) { idNames[holiday] = name; }
-    else { idNames[holiday] = {'name':name, 'color':color}; }
-    names[id] = idNames;
-    interaction.reply({ content: 'Holiday name has been changed', ephemeral: true });
     return names;
 }
 
@@ -269,7 +267,7 @@ module.exports.printNames = (names) => {
             if(typeof names[holiday['name'].toLowerCase().trim()] === 'string') {
                 output += holiday['name'] + ' - ' + names[holiday['name'].toLowerCase().trim()] + '\n';
             } else {
-            output += holiday['name'] + ' - ' + names[holiday['name'].toLowerCase().trim()].name + ' - ' + names[holiday['name'].toLowerCase().trim()].color + '\n';
+                output += holiday['name'] + ' - ' + names[holiday['name'].toLowerCase().trim()].name + ' - ' + names[holiday['name'].toLowerCase().trim()].color + '\n';
             }
         } else {
             output += holiday['name'] + ' - ' + 'No name set' + '\n';
@@ -279,7 +277,7 @@ module.exports.printNames = (names) => {
         if(typeof names['default'] === 'string') {
             output += 'Default' + ' - ' + names['default'];
         } else {
-        output += 'Default' + ' - ' + names['default'].name + ' - ' + names['default'].color;
+            output += 'Default' + ' - ' + names['default'].name + ' - ' + names['default'].color;
         }
     } else {
         output += 'Default' + ' - ' + 'No name set';
@@ -287,19 +285,123 @@ module.exports.printNames = (names) => {
     return output;
 }
 
+module.exports.defaultIcon = (icons, icon, interaction) => {
+    var serverId = bot.guilds.cache.at(0).id;
+    if(!icons[serverId]) {
+        icons[serverId] = {};
+    }
+    icons[serverId]['default'] = interaction.options.getString('image link');
+    interaction.reply({ content: 'Default icon has been added/updated', ephemeral: true });
+    return icons;
+}
+
+module.exports.addIcon = (icons, icon, holiday, interaction) => {
+    var serverId = bot.guilds.cache.at(0).id;
+    if(!icons[serverId]) {
+        icons[serverId] = {};
+    }
+    if(!holidayExists(holiday)) {
+        interaction.reply({ content: 'That holiday has not been added yet', ephemeral: true });
+        return;
+    }
+    icons[serverId][holiday] = icon;
+    interaction.reply({ content: 'Holiday icon has been added', ephemeral: true });
+    return icons;
+}
+
+module.exports.removeIcon = (icons, holiday, interaction) => {
+    var serverId = bot.guilds.cache.at(0).id;
+    if(!holidayExists(holiday)) {
+        interaction.reply({ content: 'That holiday has not been added yet', ephemeral: true });
+        return;
+    }
+    if(!icons[holiday]) {
+        interaction.reply({ content: "No icons for any holiday", ephemeral: true });
+        return;
+    }
+    if(!icons[serverId][holiday]) {
+        interaction.reply({ content: 'No icon for this holiday.  Use the add command instead', ephemeral: true });
+        return;
+    }
+    delete icons[serverId][holiday];
+    interaction.reply({ content: 'Holiday icon has been updated', ephemeral: true });
+    return icons;
+}
+
+module.exports.printIcons = (interaction) => {
+    var icons = JSON.parse(fs.readFileSync(holidayIconsPath));
+    var serverId = bot.guilds.cache.at(0).id;
+    var holidays = sortedHolidays();
+    var output = '';
+    holidays.forEach(holiday => {
+        if(icons[serverId][holiday['name'].toLowerCase().trim()]) {
+            output += holiday['name'] + ' - ' + icons[serverId][holiday['name'].toLowerCase().trim()] + '\n';
+        } else {
+            output += holiday['name'] + ' - ' + 'No icon set' + '\n';
+        }
+    });
+    if(icons[serverId]['default']) {
+        output += 'Default' + ' - ' + icons[serverId]['default'];
+    } else {
+        output += 'Default' + ' - ' + 'No icon set';
+    }
+    interaction.reply({ content: output.trim(), ephemeral: true });
+}
+
 module.exports.updateForNameChange = (holiday, id) => {
-    console.log(holiday);
-    console.log(currentHoliday);
-    if(holiday.localeCompare(currentHoliday) == 0) {
-        console.log('here');
+    if(holiday.localeCompare(currentHoliday) == 0 && id != bot.guilds.cache.at(0).ownerId) {
         var user = bot.guilds.cache.at(0).members.cache.find(user => user.id == id);
         if(JSON.parse(fs.readFileSync(holidayNamesPath))[id][currentHoliday]) {
-            console.log('here');
             user.setNickname(JSON.parse(fs.readFileSync(holidayNamesPath))[id][currentHoliday], 'Updated username for ' + currentHoliday);
         } else if(JSON.parse(fs.readFileSync(holidayNamesPath))[id]["default"]) {
             user.setNickname(JSON.parse(fs.readFileSync(holidayNamesPath))[id]["default"], 'Updated username for ' + currentHoliday);
         } else {
             user.setNickname(null, 'Removed holiday name for ' + currentHoliday);
+        }
+    }
+}
+
+module.exports.updateForChannelChange = (holiday, id) => {
+    if(holiday.localeCompare(currentHoliday) == 0) {
+        var holidayNames = JSON.parse(fs.readFileSync(holidayChannelsPath));
+        var channel = bot.guilds.cache.at(0).channels.cache.find(channel => channel.id == id);
+        if(holidayNames[id][currentHoliday]) {
+            channel.setName(holidayNames[id][currentHoliday], 'Updated channel for ' + currentHoliday);
+        } else if(holidayNames[id]['default']) {
+            channel.setName(holidayNames[id]['default'], 'Updated channel back to default');
+        }
+    }
+}
+
+module.exports.updateForRoleChange = (holiday, id) => {
+    if(holiday.localeCompare(currentHoliday) == 0) {
+        var holidayNames = JSON.parse(fs.readFileSync(holidayRolesPath));
+        var role = bot.guilds.cache.at(0).roles.cache.find(role => role.id == id);
+        if(holidayNames[id][currentHoliday]) {
+            if(typeof holidayNames[id][currentHoliday] === 'string') {
+                role.setName(holidayNames[id][currentHoliday], 'Updated role for ' + currentHoliday);
+            } else {
+                role.setName(holidayNames[id][currentHoliday].name, 'Updated role for ' + currentHoliday);
+                role.setColor(holidayNames[id][currentHoliday].color, 'Updated role for ' + currentHoliday);
+            }
+        } else if(holidayNames[id]['default']) {
+            if(typeof holidayNames[id]['default'] === 'string') {
+                role.setName(holidayNames[id]['default'], 'Updated role back to default');
+            } else {
+                role.setName(holidayNames[id]['default'].name, 'Updated role back to default');
+                role.setColor(holidayNames[id]['default'].color, 'Updated role for ' + currentHoliday);
+            }
+        }
+    }
+}
+
+module.exports.updateForIconChange = (holiday) => {
+    if(holiday.localeCompare(currentHoliday) == 0) {
+        var serverId = bot.guilds.cache.at(0).id;
+        if(JSON.parse(fs.readFileSync(holidayIconsPath))[serverId][currentHoliday]) {
+            bot.guilds.cache.at(0).setIcon(JSON.parse(fs.readFileSync(holidayIconsPath))[serverId][currentHoliday], 'Updated username for ' + currentHoliday);
+        } else if(JSON.parse(fs.readFileSync(holidayIconsPath))[serverId]["default"]) {
+            bot.guilds.cache.at(0).setIcon(JSON.parse(fs.readFileSync(holidayIconsPath))[serverId]["default"], 'Updated username for ' + currentHoliday);
         }
     }
 }

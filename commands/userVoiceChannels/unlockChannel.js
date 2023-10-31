@@ -1,7 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const Discord = require('discord.js');
 const Permissions = Discord.Permissions;
-const userChannels = require('./userVoiceChannels.js');
+const userChannels = require('./_userVoiceChannels.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()

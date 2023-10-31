@@ -10,7 +10,7 @@ module.exports = {
 			subcommand.setName('default')
 				.setDescription('Sets a default channel name when it is not a holiday')
                 .addChannelOption(option => option.setName('channel').setDescription('Channel for the name').setRequired(true))
-                .addStringOption(option => option.setName('name').setDescription('Roles name for when its not a holiday').setRequired(true)))
+                .addStringOption(option => option.setName('name').setDescription('Channels name for when its not a holiday').setRequired(true)))
         .addSubcommand(subcommand =>
 			subcommand.setName('add')
 				.setDescription('Adds a new channel name for a holiday')
@@ -18,16 +18,10 @@ module.exports = {
                 .addChannelOption(option => option.setName('channel').setDescription('Channel for the name').setRequired(true))
                 .addStringOption(option => option.setName('name').setDescription('Channels name for the holiday').setRequired(true)))
         .addSubcommand(subcommand =>
-            subcommand.setName('replace')
-                .setDescription('Replaces a channel name for a holiday')
-                .addStringOption(option => option.setName('holiday').setDescription('Holiday for the name change').setRequired(true))
-                .addChannelOption(option => option.setName('channel').setDescription('Channel for the new name').setRequired(true))
-                .addStringOption(option => option.setName('name').setDescription('Roles new name for the holiday').setRequired(true)))
-        .addSubcommand(subcommand =>
             subcommand.setName('remove')
                 .setDescription('Removes a channel name for a holiday')
                 .addChannelOption(option => option.setName('channel').setDescription('Channel to remove name').setRequired(true))
-                .addStringOption(option => option.setName('holiday').setDescription('Holiday for the name change').setRequired(true)))
+                .addStringOption(option => option.setName('holiday').setDescription('Holiday for the channel name removal').setRequired(true)))
         .addSubcommand(subcommand =>
             subcommand.setName('print')
                 .setDescription('Displays your holiday channel names')),
@@ -37,8 +31,6 @@ module.exports = {
 			defaultName(interaction);
         } else if (interaction.options.getSubcommand() == 'add') {
 			addHolidayName(interaction);
-		} else if (interaction.options.getSubcommand() == 'replace') {
-			changeHolidayName(interaction);
 		} else if (interaction.options.getSubcommand() == 'remove') {
 			removeHolidayName(interaction);
 		} else if (interaction.options.getSubcommand() == 'print') {
@@ -54,21 +46,19 @@ module.exports.startup = (client) => {
 function defaultName(interaction) {
     var channels = setDefaultName(getHolidayChannels(), interaction.options.getChannel('channel').id, interaction.options.getString('name'), interaction);
     setHolidayChannels(channels);
+    updateForChannelChange('default', interaction.options.getChannel('channel').id);
 }
 
 function addHolidayName(interaction) {
     var names = addName(getHolidayChannels(), interaction.options.getChannel('channel').id, interaction.options.getString('holiday').toLowerCase().trim(), interaction.options.getString('name'), interaction);
     setHolidayChannels(names);
-}
-
-function changeHolidayName(interaction) {
-    var names = changeName(getHolidayChannels(), interaction.options.getChannel('channel').id, interaction.options.getString('holiday').toLowerCase().trim(), interaction.options.getString('name'), interaction);
-    setHolidayChannels(names);
+    updateForChannelChange(interaction.options.getString('holiday').toLowerCase().trim(), interaction.options.getChannel('channel').id);
 }
 
 function removeHolidayName(interaction) {
     var names = removeName(getHolidayChannels(), interaction.options.getChannel('channel').id, interaction.options.getString('holiday').toLowerCase().trim(), interaction);
     setHolidayChannels(names);
+    updateForChannelChange('default', interaction.options.getChannel('channel').id);
 }
 
 function printHolidayChannels(interaction) {
