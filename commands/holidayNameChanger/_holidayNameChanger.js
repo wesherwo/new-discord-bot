@@ -181,6 +181,8 @@ function sortedHolidays() {
     return sortedHolidays;
 }
 
+module.exports.getSortedHolidays = () => { return sortedHolidays(); }
+
 module.exports.getHolidays = () => { return JSON.parse(fs.readFileSync(holidaysPath));}
 module.exports.setHolidays = (holidays) => { 
     var jsonData = JSON.stringify(holidays);
