@@ -285,12 +285,12 @@ module.exports.printNames = (names) => {
     return output;
 }
 
-module.exports.defaultIcon = (icons, icon, interaction) => {
+module.exports.setDefaultIcon = (icons, icon, interaction) => {
     var serverId = bot.guilds.cache.at(0).id;
     if(!icons[serverId]) {
         icons[serverId] = {};
     }
-    icons[serverId]['default'] = interaction.options.getString('image link');
+    icons[serverId]['default'] = icon;
     interaction.reply({ content: 'Default icon has been added/updated', ephemeral: true });
     return icons;
 }
