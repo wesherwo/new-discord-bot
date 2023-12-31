@@ -53,10 +53,7 @@ async function ping (interaction, newInteraction) {
         var currTime = new Date();
         var timer = pingTime.getTime() - currTime.getTime();
         if(timer < 0){
-            interaction.reply({ content: 'Must be a time in the future', ephemeral: true });
-            console.log('Must be a time in the future.  Ping has been deleted.');
-            deletePing(interaction);
-            return;
+            pingTime.setFullYear(pingTime.getFullYear() + 1);
         }
         var date = new Date();
         dateString = dateString.substring(0,dateString.indexOf(':00')) + dateString.substring(dateString.indexOf(':00') + 3);
