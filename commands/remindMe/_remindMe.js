@@ -49,12 +49,13 @@ async function ping (interaction, newInteraction) {
         }
         pingTime.setMinutes(interaction.options.getInteger('minute'));
         pingTime.setSeconds(0);
-        var dateString = pingTime.toLocaleString();
         var currTime = new Date();
         var timer = pingTime.getTime() - currTime.getTime();
         if(timer < 0){
             pingTime.setFullYear(pingTime.getFullYear() + 1);
+            timer = pingTime.getTime() - currTime.getTime();
         }
+        var dateString = pingTime.toLocaleString();
         var date = new Date();
         dateString = dateString.substring(0,dateString.indexOf(':00')) + dateString.substring(dateString.indexOf(':00') + 3);
         interaction.reply(`React to this message to be pinged at ${dateString} <t:${Math.floor((pingTime.getTime()) / 1000)}:R> for:\n\n` + interaction.options.getString('message'));
