@@ -3,24 +3,28 @@ const { getHolidayNames, setHolidayNames, setDefaultName, addName, removeName, p
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('holiday-name')
+		.setName('admin-name')
 		.setDescription('Edit holiday names for a user')
         .addSubcommand(subcommand =>
 			subcommand.setName('default')
 				.setDescription('Sets a default nickname when it is not a holiday')
+                .addUserOption(option => option.setName('user').setDescription('User for the default name').setRequired(true))
                 .addStringOption(option => option.setName('name').setDescription('Users default nickname').setRequired(true)))
         .addSubcommand(subcommand =>
 			subcommand.setName('add')
 				.setDescription('Adds a new nickname for a holiday')
+                .addUserOption(option => option.setName('user').setDescription('User for the holiday name').setRequired(true))
                 .addStringOption(option => option.setName('holiday').setDescription('Holiday for the name change').setRequired(true))
                 .addStringOption(option => option.setName('name').setDescription('Users nickname for the holiday').setRequired(true)))
         .addSubcommand(subcommand =>
             subcommand.setName('remove')
                 .setDescription('Removes a nickname for a holiday')
+                .addUserOption(option => option.setName('user').setDescription('User for the holiday name').setRequired(true))
                 .addStringOption(option => option.setName('holiday').setDescription('Holiday for the name change').setRequired(true)))
         .addSubcommand(subcommand =>
             subcommand.setName('print')
-                .setDescription('Displays your holiday names')),
+                .addUserOption(option => option.setName('user').setDescription('User to print names for').setRequired(true))
+                .setDescription('Displays holiday names for a user')),
         
 	async execute(client, interaction) {
 		if (interaction.options.getSubcommand() == 'default') {
@@ -36,29 +40,29 @@ module.exports = {
 };
 
 function defaultName(interaction) {
-    var names = setDefaultName(getHolidayNames(), interaction.user.id, interaction.options.getString('name'), interaction);
+    var names = setDefaultName(getHolidayNames(), interaction.options.getMember('user').id, interaction.options.getString('name'), interaction);
     setHolidayNames(names);
-    updateForNameChange("default", interaction.user.id);
+    updateForNameChange("default", interaction.options.getMember('user').id);
 }
 
 function addHolidayName(interaction) {
-    var names = addName(getHolidayNames(), interaction.user.id, interaction.options.getString('holiday').toLowerCase().trim(), interaction.options.getString('name'), interaction);
+    var names = addName(getHolidayNames(), interaction.options.getMember('user').id, interaction.options.getString('holiday').toLowerCase().trim(), interaction.options.getString('name'), interaction);
     setHolidayNames(names);
-    updateForNameChange(interaction.options.getString('holiday').toLowerCase().trim(), interaction.user.id);
+    updateForNameChange(interaction.options.getString('holiday').toLowerCase().trim(), interaction.options.getMember('user').id);
 }
 
 function removeHolidayName(interaction) {
-    var names = removeName(getHolidayNames(), interaction.user.id, interaction.options.getString('holiday').toLowerCase().trim(), interaction);
+    var names = removeName(getHolidayNames(), interaction.options.getMember('user').id, interaction.options.getString('holiday').toLowerCase().trim(), interaction);
     setHolidayNames(names);
-    updateForNameChange('default', interaction.user.id);
+    updateForNameChange('default', interaction.options.getMember('user').id);
 }
 
 function printHolidayNames(interaction) {
     var names = getHolidayNames();
-    if(!names[interaction.user.id]) {
-        interaction.reply({ content: "You don't have any holiday names", ephemeral: true });
+    if(!names[interaction.options.getMember('user').id]) {
+        interaction.reply({ content: "They don't have any holiday names", ephemeral: true });
         return;
     }
-    var output = printNames(names[interaction.user.id]);
+    var output = printNames(names[interaction.options.getMember('user').id]);
     interaction.reply({ content: output.trim(), ephemeral: true });
 }

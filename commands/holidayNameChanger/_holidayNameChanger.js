@@ -351,15 +351,17 @@ module.exports.printIcons = (interaction) => {
 }
 
 module.exports.updateForNameChange = (holiday, id) => {
+    var user = bot.guilds.cache.at(0).members.cache.find(user => user.id == id);
     if(holiday.localeCompare(currentHoliday) == 0 && id != bot.guilds.cache.at(0).ownerId) {
-        var user = bot.guilds.cache.at(0).members.cache.find(user => user.id == id);
         if(JSON.parse(fs.readFileSync(holidayNamesPath))[id][currentHoliday]) {
             user.setNickname(JSON.parse(fs.readFileSync(holidayNamesPath))[id][currentHoliday], 'Updated username for ' + currentHoliday);
-        } else if(JSON.parse(fs.readFileSync(holidayNamesPath))[id]["default"]) {
-            user.setNickname(JSON.parse(fs.readFileSync(holidayNamesPath))[id]["default"], 'Updated username for ' + currentHoliday);
+        } else if(JSON.parse(fs.readFileSync(holidayNamesPath))[id]['default']) {
+            user.setNickname(JSON.parse(fs.readFileSync(holidayNamesPath))[id]['default'], 'Updated username for ' + currentHoliday);
         } else {
             user.setNickname(null, 'Removed holiday name for ' + currentHoliday);
         }
+    } else if(holiday.localeCompare('default') == 0) {
+        user.setNickname(JSON.parse(fs.readFileSync(holidayNamesPath))[id]['default'], 'Updated username for ' + currentHoliday);
     }
 }
 
