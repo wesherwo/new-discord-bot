@@ -97,8 +97,10 @@ function updateHolidayNames() {
     var holidayNames = JSON.parse(fs.readFileSync(holidayNamesPath));
     Object.keys(holidayNames).forEach(id => {
         var user = bot.guilds.cache.at(0).members.cache.find(user => user.id == id);
-        if(user.id == bot.guilds.cache.at(0).ownerId && user.nickname.localeCompare(holidayNames[id][currentHoliday]) != 0) {
-            user.send('Update your name for ' + holidays[currentHoliday]['name'] + ' to ' + holidayNames[id][currentHoliday]);
+        if(user.id == bot.guilds.cache.at(0).ownerId) {
+            if(user.nickname.localeCompare(holidayNames[id][currentHoliday]) != 0) {
+                user.send('Update your name for ' + holidays[currentHoliday]['name'] + ' to ' + holidayNames[id][currentHoliday]);
+            }
         } else {
             if(holidayNames[id][currentHoliday]) {
                 user.setNickname(holidayNames[id][currentHoliday], 'Updated username for ' + currentHoliday);
