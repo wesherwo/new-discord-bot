@@ -53,14 +53,18 @@ function defaultName(interaction) {
 
 function addHolidayName(interaction) {
     var names = addName(getHolidayRoles(), interaction.options.getRole('role').id, interaction.options.getString('holiday').toLowerCase().trim(), interaction.options.getString('name'), interaction, interaction.options.getString('color') ?? undefined);
-    setHolidayRoles(names);
-    updateForRoleChange(interaction.options.getString('holiday').toLowerCase().trim(), interaction.options.getRole('role').id);
+    if(names) {
+        setHolidayRoles(names);
+        updateForRoleChange(interaction.options.getString('holiday').toLowerCase().trim(), interaction.options.getRole('role').id);
+    }
 }
 
 function removeHolidayName(interaction) {
     var names = removeName(getHolidayRoles(), interaction.options.getRole('role').id, interaction.options.getString('holiday').toLowerCase().trim(), interaction);
-    setHolidayRoles(names);
-    updateForRoleChange('default', interaction.options.getRole('role').id);
+    if(names) {
+        setHolidayRoles(names);
+        updateForRoleChange('default', interaction.options.getRole('role').id);
+    }
 }
 
 function printHolidayRoles(interaction) {

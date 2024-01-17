@@ -51,14 +51,18 @@ function defaultName(interaction) {
 
 function addHolidayName(interaction) {
     var names = addName(getHolidayChannels(), interaction.options.getChannel('channel').id, interaction.options.getString('holiday').toLowerCase().trim(), interaction.options.getString('name'), interaction);
-    setHolidayChannels(names);
-    updateForChannelChange(interaction.options.getString('holiday').toLowerCase().trim(), interaction.options.getChannel('channel').id);
+    if(names) {
+        setHolidayChannels(names);
+        updateForChannelChange(interaction.options.getString('holiday').toLowerCase().trim(), interaction.options.getChannel('channel').id);
+    }
 }
 
 function removeHolidayName(interaction) {
     var names = removeName(getHolidayChannels(), interaction.options.getChannel('channel').id, interaction.options.getString('holiday').toLowerCase().trim(), interaction);
-    setHolidayChannels(names);
-    updateForChannelChange('default', interaction.options.getChannel('channel').id);
+    if(names) {
+        setHolidayChannels(names);
+        updateForChannelChange('default', interaction.options.getChannel('channel').id);
+    }
 }
 
 function printHolidayChannels(interaction) {

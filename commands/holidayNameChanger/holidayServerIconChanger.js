@@ -43,14 +43,18 @@ function defaultIcon(interaction) {
 
 function addHolidayIcon(interaction) {
     var icons = addIcon(getHolidayIcons(), interaction.options.getString('image-link'), interaction.options.getString('holiday').toLowerCase().trim(), interaction);
-    setHolidayIcons(icons);
-    updateForIconChange(interaction.options.getString('holiday').toLowerCase().trim());
+    if(icons) {
+        setHolidayIcons(icons);
+        updateForIconChange(interaction.options.getString('holiday').toLowerCase().trim());
+    }
 }
 
 function removeHolidayIcon(interaction) {
     var icons = removeIcon(getHolidayIcons(), interaction.options.getString('holiday').toLowerCase().trim(), interaction);
-    setHolidayIcons(icons);
-    updateForIconChange('default');
+    if(icons) {
+        setHolidayIcons(icons);
+        updateForIconChange('default');
+    }
 }
 
 function printHolidayIcons(interaction) {

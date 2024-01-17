@@ -43,14 +43,18 @@ function defaultName(interaction) {
 
 function addHolidayName(interaction) {
     var names = addName(getHolidayNames(), interaction.user.id, interaction.options.getString('holiday').toLowerCase().trim(), interaction.options.getString('name'), interaction);
-    setHolidayNames(names);
-    updateForNameChange(interaction.options.getString('holiday').toLowerCase().trim(), interaction.user.id);
+    if(names) {
+        setHolidayNames(names);
+        updateForNameChange(interaction.options.getString('holiday').toLowerCase().trim(), interaction.user.id);
+    }
 }
 
 function removeHolidayName(interaction) {
     var names = removeName(getHolidayNames(), interaction.user.id, interaction.options.getString('holiday').toLowerCase().trim(), interaction);
-    setHolidayNames(names);
-    updateForNameChange('default', interaction.user.id);
+    if(names) {
+        setHolidayNames(names);
+        updateForNameChange('default', interaction.user.id);
+    }
 }
 
 function printHolidayNames(interaction) {
