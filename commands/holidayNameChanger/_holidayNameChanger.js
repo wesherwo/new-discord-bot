@@ -98,7 +98,7 @@ function updateHolidayNames() {
     Object.keys(holidayNames).forEach(id => {
         var user = bot.guilds.cache.at(0).members.cache.find(user => user.id == id);
         if(user.id == bot.guilds.cache.at(0).ownerId) {
-            if(currentHoliday.localeCompare("default") && user.nickname.localeCompare(holidayNames[id][currentHoliday]) != 0) {
+            if(currentHoliday.localeCompare("default") == 0 && user.nickname.localeCompare(holidayNames[id][currentHoliday]) != 0) {
                 user.send('Update your name back to ' + holidayNames[id]['default'] + ' since the holiday is over');
             }
             else if(holidayNames[id][currentHoliday] && user.nickname.localeCompare(holidayNames[id][currentHoliday]) != 0) {
