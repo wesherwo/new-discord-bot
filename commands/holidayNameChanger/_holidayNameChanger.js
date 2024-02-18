@@ -62,14 +62,14 @@ function isHoliday() {
         var compareStartDate = new Date();
         compareStartDate.setHours(0);
         compareStartDate.setMinutes(1);
-        compareStartDate.setDate(holidays[holiday]['start-day']);
         compareStartDate.setMonth(holidays[holiday]['start-month'] - 1);
+        compareStartDate.setDate(holidays[holiday]['start-day']);
 
         var compareEndDate = new Date();
         compareEndDate.setHours(23);
         compareEndDate.setMinutes(59);
-        compareEndDate.setDate(holidays[holiday]['end-day']);
         compareEndDate.setMonth(holidays[holiday]['end-month'] - 1);
+        compareEndDate.setDate(holidays[holiday]['end-day']);
 
         if(compareStartDate.getTime() - compareEndDate.getTime() > 0) {
             if(date.getTime() - compareStartDate.getTime() >= 0) {
@@ -98,7 +98,10 @@ function updateHolidayNames() {
     Object.keys(holidayNames).forEach(id => {
         var user = bot.guilds.cache.at(0).members.cache.find(user => user.id == id);
         if(user.id == bot.guilds.cache.at(0).ownerId) {
-            if(holidayNames[id][currentHoliday] && user.nickname.localeCompare(holidayNames[id][currentHoliday]) != 0) {
+            if(currentHoliday.localeCompare("default") && user.nickname.localeCompare(holidayNames[id][currentHoliday]) != 0) {
+                user.send('Update your name back to ' + holidayNames[id]['default'] + ' since the holiday is over');
+            }
+            else if(holidayNames[id][currentHoliday] && user.nickname.localeCompare(holidayNames[id][currentHoliday]) != 0) {
                 user.send('Update your name for ' + holidays[currentHoliday]['name'] + ' to ' + holidayNames[id][currentHoliday]);
             } else if(!holidayNames[id][currentHoliday] && user.nickname.localeCompare(holidayNames[id]['default'])) {
                 user.send('Update your name back to ' + holidayNames[id]['default'] + ' since you havent come up with a name yet for ' + holidays[currentHoliday]['name']);
