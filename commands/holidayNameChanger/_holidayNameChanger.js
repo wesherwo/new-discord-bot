@@ -62,12 +62,14 @@ function isHoliday() {
         var compareStartDate = new Date();
         compareStartDate.setHours(0);
         compareStartDate.setMinutes(1);
+        compareEndDate.setDate(1);
         compareStartDate.setMonth(holidays[holiday]['start-month'] - 1);
         compareStartDate.setDate(holidays[holiday]['start-day']);
 
         var compareEndDate = new Date();
         compareEndDate.setHours(23);
         compareEndDate.setMinutes(59);
+        compareEndDate.setDate(1);
         compareEndDate.setMonth(holidays[holiday]['end-month'] - 1);
         compareEndDate.setDate(holidays[holiday]['end-day']);
 
