@@ -13,7 +13,7 @@ module.exports = {
 			subcommand.setName('add')
 				.setDescription('Adds a new icon for a holiday')
                 .addStringOption(option => option.setName('holiday').setDescription('Holiday for the name change').setRequired(true))
-                .addStringOption(option => option.setName('image-link').setDescription('Icon for the holiday').setRequired(true)))
+                .addStringOption(option => option.setName('image-name').setDescription('Icon for the holiday').setRequired(true)))
         .addSubcommand(subcommand =>
             subcommand.setName('remove')
                 .setDescription('Removes a icon for a holiday')
@@ -36,13 +36,13 @@ module.exports = {
 };
 
 function defaultIcon(interaction) {
-    var icons = setDefaultIcon(getHolidayIcons(), interaction.options.getString('image-link'), interaction);
+    var icons = setDefaultIcon(getHolidayIcons(), interaction.options.getString('image-name'), interaction);
     setHolidayIcons(icons);
     updateForIconChange('default');
 }
 
 function addHolidayIcon(interaction) {
-    var icons = addIcon(getHolidayIcons(), interaction.options.getString('image-link'), interaction.options.getString('holiday').toLowerCase().trim(), interaction);
+    var icons = addIcon(getHolidayIcons(), interaction.options.getString('image-name'), interaction.options.getString('holiday').toLowerCase().trim(), interaction);
     if(icons) {
         setHolidayIcons(icons);
         updateForIconChange(interaction.options.getString('holiday').toLowerCase().trim());

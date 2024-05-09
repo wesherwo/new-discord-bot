@@ -6,6 +6,7 @@ const holidayNamesPath = 'saveData/holidayNames.json';
 const holidayRolesPath = 'saveData/holidayRoles.json';
 const holidayChannelsPath = 'saveData/holidayChannels.json';
 const holidayIconsPath = 'saveData/holidayIcons.json';
+const holidayImagesPath = 'resources/serverIcons/';
 var bot;
 var currentHoliday;
 
@@ -161,9 +162,9 @@ function updateHolidayIcon() {
         return;
     }
     else if(icons[serverId][currentHoliday]) {
-        bot.guilds.cache.at(0).setIcon(icons[serverId][currentHoliday], 'Updated icon for ' + currentHoliday);
+        bot.guilds.cache.at(0).setIcon(holidayImagesPath + icons[serverId][currentHoliday] + '.png', 'Updated icon for ' + currentHoliday);
     } else if(icons[serverId]['default']) {
-        bot.guilds.cache.at(0).setIcon(icons[serverId]['default'], 'Updated icon back to default');
+        bot.guilds.cache.at(0).setIcon(holidayImagesPath + icons[serverId]['default'] + '.png', 'Updated icon back to default');
     }
 }
 
@@ -188,6 +189,15 @@ function sortedHolidays() {
     //same month will be 0 and different will be 1 or more * 69
     sortedHolidays.sort(function (a, b) { return ((a['start-month'] - b['start-month']) * 69) + a['start-day'] - b['start-day']});
     return sortedHolidays;
+}
+
+function imageExists(icon) {
+    try {
+        fs.readFileSync(holidayImagesPath + icon + '.png');
+    } catch (error) {
+        return false;
+    }
+    return true;
 }
 
 module.exports.getSortedHolidays = () => { return sortedHolidays(); }
@@ -297,6 +307,10 @@ module.exports.printNames = (names) => {
 }
 
 module.exports.setDefaultIcon = (icons, icon, interaction) => {
+    if(!imageExists(icon)) {
+        interaction.reply({ content: 'Image does not exist', ephemeral: true });
+        return;
+    }
     var serverId = bot.guilds.cache.at(0).id;
     if(!icons[serverId]) {
         icons[serverId] = {};
@@ -307,6 +321,10 @@ module.exports.setDefaultIcon = (icons, icon, interaction) => {
 }
 
 module.exports.addIcon = (icons, icon, holiday, interaction) => {
+    if(!imageExists(icon)) {
+        interaction.reply({ content: 'Image does not exist', ephemeral: true });
+        return;
+    }
     var serverId = bot.guilds.cache.at(0).id;
     if(!icons[serverId]) {
         icons[serverId] = {};
@@ -411,10 +429,12 @@ module.exports.updateForRoleChange = (holiday, id) => {
 module.exports.updateForIconChange = (holiday) => {
     if(holiday.localeCompare(currentHoliday) == 0) {
         var serverId = bot.guilds.cache.at(0).id;
+        var imagePath = null;
         if(JSON.parse(fs.readFileSync(holidayIconsPath))[serverId][currentHoliday]) {
-            bot.guilds.cache.at(0).setIcon(JSON.parse(fs.readFileSync(holidayIconsPath))[serverId][currentHoliday], 'Updated username for ' + currentHoliday);
+            imagePath = holidayImagesPath + JSON.parse(fs.readFileSync(holidayIconsPath))[serverId][currentHoliday] + '.png';
         } else if(JSON.parse(fs.readFileSync(holidayIconsPath))[serverId]["default"]) {
-            bot.guilds.cache.at(0).setIcon(JSON.parse(fs.readFileSync(holidayIconsPath))[serverId]["default"], 'Updated username for ' + currentHoliday);
+            imagePath = holidayImagesPath + JSON.parse(fs.readFileSync(holidayIconsPath))[serverId]["default"] + '.png';
         }
+        bot.guilds.cache.at(0).setIcon(imagePath, 'Updated username for ' + currentHoliday);
     }
 }
